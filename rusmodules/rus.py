@@ -1,43 +1,53 @@
 import numpy as np
 
-
-class Material:
+class Base:
     """
-    Clase para representar un material colocado como muestra de RUS
+    Class Base: Abstract class containing the order of the base funcion (power series or Legendre for example) and matrix phi
+    containing containing in each spot a tuple representing the order of x, y or z in each term
 
-    Atributos:
-    N <int>: Número entero que representa el órden máximo de las potencias de las funciones base
-    constantes <np.array>: Matriz de 6x6 que representa las ocnstantes elásticas del material
-    estructura_cristalina <string>: Estructura cristalina del material. Algunos ejemplos son monoclínica, triclínica cúbica, etc.
-    phi <np.array>: Matriz de (1/6)*(N+1)*(N+2)*(N+3) columnas y 3 filas que representa
-        las funciones base para halla los desplazamientos u
+    Attributes: 
+     N <int>: Integer that represents maximum order in the base funcions 
+     phi <np.array>: Matrix with (1/6)*(N+1)*(N+2)*(N+3) columns and 3 rows representing the index of the base functions
+     type <string>: Name of the base functions. For example 'Legendre'
 
-
-    Métodos: 
+     Methods: 
+     __init__: Initialization method. N must be specified
+     get_phi: Calculate the phi matrix based on the order N
+     __str__: Return a string that represents this class. In this case phi will be returned as a matrix of tuples
     """
-    def __init__(self, path, N, e_crist, encabezado=0):
+
+    def __init__(self, N):
         """
-        Completar lo de la documentación y preguntarle a Julián si está decente!!! Luego si me pongo a pensar lo de las tuplas dentro de la matrices
+        @Input:
+        N <int>: Order of the base function
         """
-        self.constantes = np.genfromtxt(path, delimiter=',', skip_header=encabezado, dtype=float)
-        self.estructura_cristalina = e_crist
         self.N = N
-    # fin fucnion
+    #fin init
 
-    def inicializar_phi(self):
-        posibles_indices = np.array(np.meshgrid(*[range(self.N + 1)] * 3)).T.reshape(-1, 3)
-        self.phi = posibles_indices[posibles_indices.sum(axis=1) <= self.N].T
-        self.phi = np.array(sorted(self.phi.T, key=lambda x: sum(x))).T
+    def get_phi(self):
+        """
+        This method calculates the phi matrix.
+
+        @ Input: None
+        @ Output: None
+        """
+        possible_index_raw = np.array(np.meshgrid(*[range(self.N + 1)] * 3)).T.reshape(-1, 3)
+        self.phi = possible_index_raw[possible_index_raw.sum(axis=1) <= self.N].T
+        self.phi = np.array(sorted(self.phi.T, key=lambda x: x[0])).T
     # fin función
 
     def __str__(self):
+        """
+        @ Input: None
+        @ Output: 
+        str(self.phi) <string>: numpy representation of phi matrix in a string format
+        """
         return str(self.phi)
     # fin funcion
-       
-# fin clase
 
+#fin clase
 
 if __name__ == '__main__':
-    material_prueba = Material('constantes.csv', 2, 'monoclinica')
-    material_prueba.inicializar_phi()
-    print(material_prueba)
+    base_test = Base(2)
+    base_test.get_phi()
+    print(base_test)
