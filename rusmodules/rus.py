@@ -1,5 +1,16 @@
 import numpy as np
 
+class IndexThree:
+    def __init__(self,input):
+        self.indices = np.array(input)
+
+    def __getitem__(self, key):
+        return self.indices[key]
+    
+    def __repr__(self):
+        return str(tuple(self.indices))
+    
+
 class Base:
     """
     Class Base: Abstract class containing the order of the base funcion (power series or Legendre for example) and matrix phi
@@ -32,8 +43,13 @@ class Base:
         @ Output: None
         """
         possible_index_raw = np.array(np.meshgrid(*[range(self.N + 1)] * 3)).T.reshape(-1, 3)
-        self.phi = possible_index_raw[possible_index_raw.sum(axis=1) <= self.N].T
-        self.phi = np.array(sorted(self.phi.T, key=lambda x: x[0])).T
+        comb_matrix = possible_index_raw[possible_index_raw.sum(axis=1) <= self.N].T
+        index_comb = np.array(list(map(lambda x: IndexThree(x), comb_matrix.T)), dtype = object)
+        combinations = len(index_comb)
+        v1 = np.r_[index_comb, np.zeros(2*combinations, dtype=int)]
+        v2 = np.r_[np.zeros(combinations, dtype=int), index_comb, np.zeros(combinations, dtype=int)]
+        v3 = np.r_[np.zeros(2*combinations, dtype=int), index_comb]
+        self.phi = (np.c_[v1, v2, v3]).T
     # fin función
 
     def __str__(self):
@@ -51,3 +67,4 @@ if __name__ == '__main__':
     base_test = Base(2)
     base_test.get_phi()
     print(base_test)
+    print(base_test.phi[:,2][0][1])
