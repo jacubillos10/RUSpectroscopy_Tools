@@ -57,3 +57,6 @@ class Forward:
         """
         sample = self.sample
         base = self.base
+        B = self.B
+        phi = base.get_phi()
+        
