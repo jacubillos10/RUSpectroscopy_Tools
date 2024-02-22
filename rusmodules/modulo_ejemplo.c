@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include </usr/include/python3.12/Python.h>
+#include </usr/include/python3.10/Python.h>
 
 PyObject *add(PyObject *self, PyObject *args)
 {
