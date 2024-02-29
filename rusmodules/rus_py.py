@@ -1,7 +1,11 @@
 import numpy as np
 from numba import njit
+from numba.pycc import CC
+
+cc = CC('rus')
 
 @njit("i8(i8,i8)")
+@cc.export("it_c", "i8(i8,i8)")
 def it_c(i,j):
     """
     This function changes the double index convention for single index convention in the elastic constant matrix C.
@@ -50,7 +54,7 @@ def generate_term_in_ſ(exp_index1, exp_index2, i1, i2, j1, j2, C, geo_par):
     return P*Q*R
 #fin función    
 
-@njit("f8(i8,i8,i8[:],i8[:],f8[:,:],f8[:])")
+@cc.export("generate_matrix_element_gamma", "f8(i8,i8,i8[:],i8[:],f8[:,:],f8[:])")
 def generate_matrix_element_ſ(i1, i2, exp_index1, exp_index2, C, geo_par):
     acum = 0
     for j1 in range(3):
@@ -62,8 +66,9 @@ def generate_matrix_element_ſ(i1, i2, exp_index1, exp_index2, C, geo_par):
 #fin función
 
 if __name__ == "__main__":
-    C_const = np.genfromtxt('constantes.csv', delimiter=',', skip_header=0, dtype=float)
+    cc.compile()
+    #C_const = np.genfromtxt('constantes.csv', delimiter=',', skip_header=0, dtype=float)
     #aa = generate_term_in_s(np.array([1, 0, 0]), np.array([0, 0, 1]), 0, 1, 0, 2, C_const, np.array([1, 1, 1]))
     #print(aa/8)
-    aac = generate_matrix_element_ſ(0, 1, np.array([1,0,0]), np.array([0,0,1]), C_const, np.array([1.0,1.0,1.0]))
-    print(aac/8)
+    #aac = generate_matrix_element_ſ(0, 1, np.array([1,0,0]), np.array([0,0,1]), C_const, np.array([1.0,1.0,1.0]))
+    #print(aac/8)
