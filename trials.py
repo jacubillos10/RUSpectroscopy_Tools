@@ -1,4 +1,6 @@
 import numpy as np
+import scipy.integrate as it 
+
 def generar_tuplas(N):
     nums = np.arange(0, N+1)
     # Generar todas las posibles combinaciones de índices usando broadcasting
@@ -6,11 +8,40 @@ def generar_tuplas(N):
     # Filtrar combinaciones donde la suma sea menor o igual a N
     indices_filtrados = np.where(i + j + k <= N)
     # Obtener las tuplas correspondientes a los índices filtrados
-    tuplas = np.vstack([i[indices_filtrados], j[indices_filtrados], k[indices_filtrados]]).T
-    return tuplas
+    phi = np.vstack([i[indices_filtrados], j[indices_filtrados], k[indices_filtrados]]).T 
+    n = len(phi)
+    E = np.array([])
+    for i in range(n):
+        for j in range(n):
+            whole = np.concatenate((phi[i],phi[j]))
+            if i == 0 and j == 0:
+                E = np.hstack((E,np.array(whole)))
+            else:
+                E = np.vstack((E,np.array(whole)))
+    n = len(E)
+    n_i = len(E[0])
+    E_int = np.array([])
+    row = np.array([])
+    for i in range(n):
+        exps = []
+        l=0
+        for j in range(n_i):
+            exps.append(E[i,j])
+        f = lambda x,y,z: x**(exps[0]+exps[3]) * y**(exps[1]+exps[4]) * z**(exps[2]+exps[5])
+        result = it.tplquad(f,-1,1,-1,1,-1,1)
+        row = np.append(row,result[0])
+        if len(row) == n//4 and i == n//4 - 1:
+            E_int = np.hstack((E_int,row))
+            row = np.delete(row,[range(n//4)])
+        elif len(row) == n//4:
+            E_int = np.vstack((E_int,row))
+            row = np.delete(row,[range(n//4)])
+    print(len(E_int[0]))
+    return E_int
 
 # Ejemplo de uso
 N = int(input("Ingrese un entero N: "))
 tuplas = generar_tuplas(N)
 print("Tuplas cuya suma es menor o igual a", N, ":")
 print(tuplas)
+
