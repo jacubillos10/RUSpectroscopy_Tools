@@ -9,10 +9,10 @@ def generar_tuplas(N):
     indices_filtrados = np.where(i + j + k <= N)
     # Obtener las tuplas correspondientes a los índices filtrados
     phi = np.vstack([i[indices_filtrados], j[indices_filtrados], k[indices_filtrados]]).T 
-    n = len(phi)
+    n1 = len(phi)
     E = np.array([])
-    for i in range(n):
-        for j in range(n):
+    for i in range(n1):
+        for j in range(n1):
             whole = np.concatenate((phi[i],phi[j]))
             if i == 0 and j == 0:
                 E = np.hstack((E,np.array(whole)))
@@ -30,12 +30,12 @@ def generar_tuplas(N):
         f = lambda x,y,z: x**(exps[0]+exps[3]) * y**(exps[1]+exps[4]) * z**(exps[2]+exps[5])
         result = it.tplquad(f,-1,1,-1,1,-1,1)
         row = np.append(row,result[0])
-        if len(row) == n//4 and i == n//4 - 1:
+        if len(row) == n1 and i == n1- 1:
             E_int = np.hstack((E_int,row))
-            row = np.delete(row,[range(n//4)])
-        elif len(row) == n//4:
+            row = np.delete(row,[range(n1)])
+        elif len(row) == n1:
             E_int = np.vstack((E_int,row))
-            row = np.delete(row,[range(n//4)])
+            row = np.delete(row,[range(n1)])
     print(len(E_int[0]))
     return E_int
 
