@@ -42,27 +42,7 @@ class base:
         self.N = N
         self.type = type 
         self.phi = self.calc_phi()
-
-
-    def get_type(self):
-        """
-        Type attribute class getter.
-        """
-        return self.type
     
-    def get_N(self):
-        """
-        N attribute class getter.
-        """
-        return self.N
-    
-    def get_phi(self):
-        """
-        phi attribute class getter.
-        """
-        return self.phi
-    
-
     def calc_phi(self):
         """
         Method incharge of calculating the phi array made of the index combinations for the specified N.
@@ -71,7 +51,6 @@ class base:
          phi<np.array<tuples<int>>>:Numpy array with the expansion of the base functions represented with indexes in tuples.
         """
         N = self.N
-        type = self.type
         nums = np.arange(0, N+1)
         i, j, k = np.broadcast_arrays(nums[:, None, None], nums[None, :, None], nums[None, None, :])        
         indices_filtrados = np.where(i + j + k <= N)
@@ -93,12 +72,6 @@ class sample:
 
     Methods: 
      __init__: Initialization method. shape, system, rho, C and limits must be specified.
-     get_shape: Returns the user the name of the shape of the sample.
-     get_system: Returns the user the name of the crystalline system of teh sample.
-     get_limits: Returns the user the array with the limits (size) of the sample.
-     get_rho: Returns the user the float that corresponds to the density of the sample.
-     get_C: Returns the user the constant matrix that corresponds to the sample.
-
     """
 
     def __init__(self,shape,system,limits,rho,C):
@@ -118,35 +91,7 @@ class sample:
         self.rho = rho
         self.C = C
     
-    def get_shape(self):
-        """
-        Shape attribute class getter.
-        """
-        return self.shape
     
-    def get_system(self):
-        """
-        System attribute class getter.
-        """
-        return self.system
-    
-    def get_limits(self):
-        """
-        Limits attribute class getter.
-        """
-        return self.limits
-    
-    def get_rho(self):
-        """
-        Rho attribute class getter.
-        """
-        return self.rho
-    
-    def get_c(self):
-        """
-        C attribute class getter.
-        """
-        return self.C
     
 class Forward: 
     """
@@ -163,6 +108,7 @@ class Forward:
      calc_G: Method that calculates and does the volume integral for each of the values of the matrix Gamma.
      calc_eigenvals: Method that solves the generalized eigenvalue problem for the specified E, G and rho.
     """
+
     def __init__(self,N,type,shape,system,limits,rho,C):
         """
         Class initialization.
@@ -176,30 +122,59 @@ class Forward:
          rho <float>: A float that corresponds to the density of the sample.
          C <np.array<np.array<float>>>: A numpy array matrix that holds the value of the elastic constants of the sample.
         """
-        Sample = sample(shape,system,limits,rho,C)
-        Base = base(N,type)
+        self.sample = sample(shape,system,limits,rho,C)
+        self.base = base(N,type)
 
-    def calc_E(self,Base):
+    def construct_E_from_red(self,E_int):
         """
-        Matrix E calculator. 
+        Matrix E constructor. Constructs the final matrix E from the reduced version of the matrix already integrated.
 
         @Input:
-         Base <base>: Object of type <base> that holds all of teh information needed form the base functions to solve the problem.
+         E_int <np.array<np.array<int>>>:  A numpy array that holds a reduced version of the E matrix.
 
         @Output:
-         E <np.array<np.array<int>>>: A numpy array that holds the information of the volume integral for the 
-         product of phi with phi trasposed (phi: the expansion of the base functions represented with indexes). 
+         E <np.array<np.array<int>>>: A numpy array that corresponds to the kinetic energy term of the Lagrangian 
+         of the problem obtained with the volume integral of the product of the array phi with phi transposed 
+         (phi: the expansion of the base functions represented with indexes). 
         """
-        phi = Base.get_phi()
+        N = len(E_int)
+        zero_aux = np.zeros([N])
+        E = np.array([])
+        for i in range(N):
+            row = np.concatenate((E_int[i],zero_aux,zero_aux))
+            if i == 0:
+                E = np.hstack((E,row))
+            else:
+                E = np.vstack((E,row))
+        for i in range(N):
+            row = np.concatenate((zero_aux,E_int[i],zero_aux))
+            E = np.vstack((E,row))
+        for i in range(N):
+            row = np.concatenate((zero_aux,zero_aux,E_int[i]))
+            E = np.vstack((E,row))
+        return E
+
+    def calc_E(self):
+        """
+        Matrix E calculator. Calculates and returns the matrix E that corresponds the kinetic term of the Lagrangian of 
+        the problem. 
+
+        @Output:
+         E <np.array<np.array<int>>>: A numpy array that corresponds to the kinetic energy term of the Lagrangian 
+         of the problem obtained with the volume integral of the product of the array phi with phi transposed 
+         (phi: the expansion of the base functions represented with indexes). 
+        """
+        base = self.base
+        phi = base.get_phi()
         n1 = len(phi)
         E_red = np.array([])
         for i in range(n1):
             for j in range(n1):
                 whole = np.concatenate((phi[i],phi[j]))
                 if i == 0 and j == 0:
-                    E_red = np.hstack((E,np.array(whole)))
+                    E_red = np.hstack((E_red,np.array(whole)))
                 else:
-                    E_red = np.vstack((E,np.array(whole)))
+                    E_red = np.vstack((E_red,np.array(whole)))
 
         n = len(E_red)
         n_i = len(E_red[0])
@@ -219,29 +194,16 @@ class Forward:
             elif len(row) == n1:
                 E_int = np.vstack((E_int,row))
                 row = np.delete(row,[range(n1)])
+        
+        E = self.construct_E_from_red(E_int)
 
-        return E_int
+        return E
     
-    def construct_E_from_red(E_int):
+    def calc_G(self):
         """
-        Matrix E constructor. Constructs the final matrix E from the reduced version of the matrix already integrated.
-
-        @Input:
-         E_int <np.array<np.array<int>>>:  A numpy array that holds a reduced version of the information of the volume integral 
-         for the product of phi with phi trasposed (phi: the expansion of the base functions represented with indexes).
+        Matrix G calculator. 
 
         @Output:
-         E <np.array<np.array<int>>>: A numpy array that holds the information of the volume integral for the 
-         product of phi with phi trasposed (phi: the expansion of the base functions represented with indexes). 
+         G <np.array<np.array<int>>>: A numpy array that coresponds to the potential energy term of the Lagrangian 
+         of the problem obtained with the volume integral of the 
         """
-        N = len(E_int)
-        zero_aux = np.zeros([N,N])
-        #for i in range(N):
-
-
-
-
-        
-
-
-
