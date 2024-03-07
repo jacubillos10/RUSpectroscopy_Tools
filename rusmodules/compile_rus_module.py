@@ -80,22 +80,48 @@ def generate_matrix_element_ſ(i1, i2, exp_index1, exp_index2, C, geo_par):
     return acum
 #fin función
 
-#@njit("f8[:](i8, f8[:,:], f8[:])")
-@cc.export("gamma_matrix", "f8[:](i8, f8[:,:], f8[:])")
-def gamma_matrix(N, C, geo_par):
-    combi = np.zeros(3)
-    for i in range(N):
-        for j in range(N - j):
-            k = (N -1) - i - j
-            
-
+@njit("i8[:,:](i8)")
+@cc.export("generate_combinations", "i8[:,:](i8)")
+def generate_combinations(N):
+    R = int((1/6) * (N + 1) * (N + 2) * (N + 3))
+    combi = np.zeros((R,3), dtype=np.int64)
+    l = 0
+    for n in range(N + 1):
+        for i in range(n + 1):
+            for j in range(n + 1 - i):
+                k = n - i - j
+                combi[l,:] = np.array([i, j, k])
+                l += 1
+        #fin for 
     #fin for 
-    return np.array([1.1,2.2,3.3])
+    return combi
+#fin funcion
+
+@cc.export("gamma_matrix", "f8[:,:](i8, f8[:,:], f8[:])")
+def gamma_matrix(N, C, geo_par):
+    comb = generate_combinations(N)
+    R = len(comb[:,0])
+    gamma = np.zeros((3*R,3*R), dtype = np.float64)
+    for i in range(3):
+        for j in range(3):
+            for lm in range(R):
+                for lf in range(R):
+                    exp_index1 = comb[lm,:]
+                    exp_index2 = comb[lf,:]
+                    gamma[(i*R + lm), (j*R + lf)] = generate_matrix_element_ſ(i, j, exp_index1, exp_index2, C, geo_par)
+                #fin for 
+            #fin for 
+        #fin for 
+    #fin for 
+    return gamma
+#fin función 
+
 
 if __name__ == "__main__":
     cc.compile()
-    #C_const = np.genfromtxt('constantes.csv', delimiter=',', skip_header=0, dtype=float)
+    C_const = np.genfromtxt('constantes.csv', delimiter=',', skip_header=0, dtype=float)
     #aa = generate_term_in_ſ(np.array([1, 0, 0]), np.array([0, 0, 1]), 0, 1, 0, 2, C_const, np.array([1.0, 1.0, 1.0]))
     #print(aa)
     #aac = generate_matrix_element_ſ(0, 1, np.array([1,0,0]), np.array([0,0,1]), C_const, np.array([1.0,1.0,1.0]))
     #print(aac/8)
+    print(gamma_matrix(1, C_const, np.array([1.0, 1.0, 1.0])))
