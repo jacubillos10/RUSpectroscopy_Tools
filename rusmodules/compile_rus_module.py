@@ -80,6 +80,22 @@ def generate_matrix_element_ſ(i1, i2, exp_index1, exp_index2, C, geo_par):
     return acum
 #fin función
 
+@njit("f8(i8,i8,i8[:],i8[:])")
+@cc.export("generate_matrix_element_E", "f8(i8,i8,i8[:],i8[:])")
+def generate_matrix_element_E(i1, i2, exp_index1, exp_index2):
+    if i1 != i2:
+        return 0
+    else:
+        coeff = exp_index1 + exp_index2 + 1
+        Q = (1 - (-1)**coeff[0])*(1 - (-1)**coeff[1])*(1 - (-1)**coeff[2])
+        if Q == 0:
+            return 0
+        #fin if
+        den = coeff[0]*coeff[1]*coeff[2]
+        return Q/den
+    #fin if
+#fin funcion
+
 @njit("i8[:,:](i8)")
 @cc.export("generate_combinations", "i8[:,:](i8)")
 def generate_combinations(N):
@@ -97,6 +113,25 @@ def generate_combinations(N):
     return combi
 #fin funcion
 
+@cc.export("E_matrix", "f8[:,:](i8)")
+def E_matrix(N):
+    comb = generate_combinations(N)
+    R = len(comb[:,0])
+    E = np.zeros((3*R,3*R), dtype = np.float64)
+    for i in range(3):
+        for j in range(3):
+            for lm in range(R):
+                for lf in range(R):
+                    exp_index1 = comb[lm,:]
+                    exp_index2 = comb[lf,:]
+                    E[(i*R + lm), (j*R + lf)] = generate_matrix_element_E(i, j, exp_index1, exp_index2)
+                #fin for
+            #fin for
+        #fin for
+    #fin for 
+    return E
+#fin función
+                    
 @cc.export("gamma_matrix", "f8[:,:](i8, f8[:,:], f8[:])")
 def gamma_matrix(N, C, geo_par):
     comb = generate_combinations(N)
@@ -124,4 +159,4 @@ if __name__ == "__main__":
     #print(aa)
     #aac = generate_matrix_element_ſ(0, 1, np.array([1,0,0]), np.array([0,0,1]), C_const, np.array([1.0,1.0,1.0]))
     #print(aac/8)
-    print(gamma_matrix(1, C_const, np.array([1.0, 1.0, 1.0])))
+    #print(gamma_matrix(1, C_const, np.array([1.0, 1.0, 1.0])))
