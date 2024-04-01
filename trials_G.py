@@ -16,7 +16,7 @@ def it_c(i,j):
         index = i
     else:
         index = 6 - (i + j)
-        
+         
     return index
 
 def construct_full_phi(phi):
