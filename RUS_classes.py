@@ -3,6 +3,7 @@ import scipy.integrate as it
 import math
 from sympy import *
 import scipy.linalg as solve
+from tqdm import tqdm
 
 class base:
     """
@@ -188,7 +189,7 @@ class Forward:
         E_red = np.array([])
 
         #Phi*Phit
-        for i in range(n1):
+        for i in tqdm(range(n1)):
             for j in range(n1):
 
                 whole = np.concatenate((phi[i],phi[j]))
@@ -204,7 +205,7 @@ class Forward:
         row = np.array([])
 
         #Integration (Only valid for rectangular parallelepipeids)
-        for i in range(n):
+        for i in tqdm(range(n)):
             exps = []
             for j in range(n_i):
                 exps.append(E_red[i,j])
@@ -305,7 +306,7 @@ class Forward:
         #B*PHI 
         prod = np.zeros((6,n,4))
 
-        for k in range(6):
+        for k in tqdm(range(6)):
             for i in range(n):
                 for j in range(N):
                     for z in range(N):
@@ -374,7 +375,7 @@ class Forward:
         half_res = np.zeros((N1,n1,4))
 
         #PHIt*Bt*C
-        for i in range(N1):
+        for i in tqdm(range(N1)):
             for j in range(6):
                 for k in range(n1):   
                     half_res[i,j,3] += prod_t[i,k,3] * C[k,j]
@@ -382,7 +383,7 @@ class Forward:
         G_noint = np.zeros((N1,n2,8))
 
         #PHIt*Bt*C*B*PHI
-        for i in range(N1):
+        for i in tqdm(range(N1)):
             row = np.array([])
             for j in range(n1):
                 for k in range(n2):

@@ -18,4 +18,6 @@ if __name__ == "__main__":
                 C[r,l] = row[l]
         Forward = rus.Forward(N,type,shape,system,limits,rho,C)
         w2 = Forward.W2
-        print(w2)
+        for w in range(len(w2)):
+            sys.stdout.write(str(w2[w]))
+            sys.stdout.write("\n")
