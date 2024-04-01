@@ -32,6 +32,7 @@ def construct_E_from_int(E_int):
         return E
 
 def generar_tuplas(N,limits):
+    np.set_printoptions(precision=2)
     nums = np.arange(0, N+1)
     # Generar todas las posibles combinaciones de índices usando broadcasting
     i, j, k = np.broadcast_arrays(nums[:, None, None], nums[None, :, None], nums[None, None, :])
@@ -70,7 +71,11 @@ def generar_tuplas(N,limits):
         elif len(row) == n1:
             E_int = np.vstack((E_int,row))
             row = np.delete(row,[range(n1)])
-
+    W = np.linalg.eigvalsh(E_int)
+    print(np.all(W>=0))
+    print(np.linalg.norm(E_int-E_int.T))
+    print(W)
+    exit()
     E = construct_E_from_int(E_int)
     return E
 
@@ -79,7 +84,7 @@ N = int(input("Ingrese un entero N: "))
 l = list(map(float,input("Ingrese las medidas del paralelepipedo separadas por comas: ").strip().split(",")))
 limits = np.array(l)
 tuplas = generar_tuplas(N,limits)
-print(tuplas)
+p
 """
 f = lambda x,y,z: x**(exps[0]+exps[3]) * y**(exps[1]+exps[4]) * z**(exps[2]+exps[5])
         result = it.tplquad(f,-1,1,-1,1,-1,1,epsabs=1.49e-2,epsrel=1.49e-2)

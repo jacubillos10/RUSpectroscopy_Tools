@@ -10,52 +10,19 @@ def construct_full_phi(phi):
     PHI = np.array([elem1,elem2,elem3])
     return PHI
 
-def derivation_PHI(PHI,transposed):
-    N = len(PHI)
-    n = len(PHI[0])
-    B = np.zeros((6,3,2))
-    B[0,0,0] = 1
-    B[1,1,0] = 1
-    B[2,2,0] = 1
-    B[3,1,0] = 1/2
-    B[3,2,0] = 1/2
-    B[4,0,0] = 1/2
-    B[4,2,0] = 1/2
-    B[5,0,0] = 1/2
-    B[5,1,0] = 1/2
-    B[0,0,1] = 1
-    B[1,1,1] = 1
-    B[2,2,1] = 1
-    B[3,1,1] = 1
-    B[3,2,1] = 1
-    B[4,0,1] = 1
-    B[4,2,1] = 1
-    B[5,0,1] = 1
-    B[5,1,1] = 1
-    #B*PHI (B: derivation matrix)
-    prod = np.zeros((6,n,4))
-    for k in tqdm(range(6)):
-        for i in range(n):
-            for j in range(N):
-                for z in range(N):
-                    phi_elem = PHI[j,i]
-                    exp = phi_elem[j]
-                    if k == 0 or k == 1 or k ==2:
-                        if PHI[j,i,z] != 0 and z == j:
-                            new = phi_elem.copy()
-                            new[z] -= B[k,j,1]
-                            new = np.append(new,PHI[j,i,z] * B[k,j,0])
-                        else:
-                            new = np.zeros(4)
-                    else:
-                        if PHI[j,i,z] != 0 and ((k == 3 and ((j == 1 and z == 2) or ( j == 2 and z == 1))) or (k == 5 and ((j == 1 and z == 0) or ( j == 0 and z == 1))) or (k == 4 and ((j == 2 and z == 0) or ( j == 0 and z == 2)))):
-                            new = phi_elem.copy()
-                            new[z] -= B[k,j,1]
-                            new = np.append(new,PHI[j,i,z] * B[k,j,0])
-                        else:
-                            new = np.zeros(4)
+def construct_elem_G(elem1, elem2):
+    for i in range(3):
+        for j in range(3):
+            if i == j:
+                if (elem1[i] + elem2[j] - 2) // 2 == 0:
                     
-                    prod[k,i] += new       
+                else: 
+                    return np.zeros(3)    
+
+
+
+def derivation_PHI(PHI,transposed):
+    prod=None    
             
     if transposed:
         prodt = np.transpose(prod,(1,0,2))
@@ -141,5 +108,5 @@ C = np.array([[c[0],c[1],c[2],c[3],c[4],c[5]],
               [c[5],c[10],c[14],c[17],c[19],c[20]]])
 
 G = calc_G(C,limits,N)
-print(np.all(np.linalg.eigvals(G))>=0)
+print(G)
 
