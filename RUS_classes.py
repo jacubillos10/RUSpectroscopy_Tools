@@ -168,7 +168,28 @@ class Forward:
             E = np.vstack((E,row))
 
         return E
+    
+    def construct_elem_E(self,elem1,elem2,limits):
+        np.set_printoptions(linewidth=700)
+        alfa = elem1[0]
+        alfap = elem2[0]
+        beta = elem1[1]
+        betap = elem2[1]
+        delta = elem1[2]
+        deltap = elem2[2]
 
+        exp1 = alfa+alfap+1
+        exp2 = beta+betap+1
+        exp3 = delta+deltap+1
+
+        coef = (1 - (-1)**exp1)*(1 - (-1)**exp2)*(1 - (-1)**exp3)
+        if  coef != 0 :
+            element = (coef*(limits[0]**(exp1))*(limits[1]**(exp2))*(limits[2]**(exp3)))/((exp1)*(exp2)*(exp3))
+        else: 
+            element = 0
+
+        return element
+    
     def calc_E(self):
         """
         Matrix E calculator. Calculates and returns the matrix E that corresponds the kinetic term of the Lagrangian of 
@@ -179,86 +200,24 @@ class Forward:
          of the problem obtained with the volume integral of the product of the array phi with phi transposed 
          (phi: The expansion of the base functions represented with indexes). 
         """
-
-        #elevant parameter
         base = self.base
         sample = self.sample
         limits = sample.limits
         phi = base.phi
-        n1 = len(phi)
-        E_red = np.array([])
+        R = len(phi)
+        E_red = np.zeros((R,R))
+        for i1 in range(3):
+            for i2 in range(3):
+                for p in range(R):
+                    for q in range(R):
+                        elem1 = phi[p]
+                        elem2 = phi[q]
+                        E_red[p,q] = self.construct_elem_E(elem1,elem2,limits)
 
-        #Phi*Phit
-        for i in tqdm(range(n1)):
-            for j in range(n1):
-
-                whole = np.concatenate((phi[i],phi[j]))
-
-                if i == 0 and j == 0:
-                    E_red = np.hstack((E_red,np.array(whole)))
-                else:
-                    E_red = np.vstack((E_red,np.array(whole)))
-
-        n = len(E_red)
-        n_i = len(E_red[0])
-        E_int = np.array([])
-        row = np.array([])
-
-        #Integration (Only valid for rectangular parallelepipeids)
-        for i in tqdm(range(n)):
-            exps = []
-            for j in range(n_i):
-                exps.append(E_red[i,j])
-
-            p = exps[0]+exps[3]
-            q = exps[1]+exps[4]
-            r = exps[2]+exps[5]
-
-            result = (8*(limits[0]**(p+1))*(limits[1]**(q+1))*(limits[2]**(r+1)))/((p+1)*(q+1)*(r+1))
-            
-            row = np.append(row,result)
-
-            if len(row) == n1 and i == n1 - 1:
-                E_int = np.hstack((E_int,row))
-                row = np.delete(row,[range(n1)])
-
-            elif len(row) == n1:
-                E_int = np.vstack((E_int,row))
-                row = np.delete(row,[range(n1)])
-        
-        #Full matrix E construction
-        E = self.construct_E_from_red(E_int)
+        E = self.construct_E_from_red(E_red)
 
         return E
     
-    def construct_full_phi(self,phi):
-        """
-        This function constructs the full matrix phi based on the reduced phi to make easier the calculation of the Gamma 
-        matrix. It stacks a phi for each posible direction (x,y,z) and zeros for the other directions on the row. Each row and
-        "block" column of the same length of phi corresponds to a single direction so the full phi matrix is diagonal by blocks
-        with elements only in the directions xx, yy and zz. 
-
-        @Input:
-         phi<np.array<np.array<int>>>:Numpy array with the expansion of the base functions represented with indexes in 
-         numpy arrays.
-        
-        @Output: 
-         PHI<np.array<np.array<np.array<int>>>>:Numpy array with the expansion of the base functions represented with indexes in 
-         numpy arrays. It has the expressions for the three directions (x,y,z). Matrix diagonal in blocks such as: [[phi][0][0],
-         [0][phi][0],[0][0][phi]].
-
-        """
-        N = len(phi)
-        n = len(phi[0])
-
-        zero_aux = np.zeros((N,n))
-
-        elem1 = np.row_stack((phi,zero_aux,zero_aux))
-        elem2 = np.row_stack((zero_aux,phi,zero_aux))
-        elem3 = np.row_stack((zero_aux,zero_aux,phi))
-
-        PHI = np.array([elem1,elem2,elem3])
-        return PHI
     
     def calc_G(self):
         """
@@ -312,57 +271,64 @@ class Forward:
         element = 0
         for j1 in range(3):
             for j2 in range(3):
+
+                elemj1 = np.zeros(3)
+                elemj2 = np.zeros(3)
+                elemj1[j1] = 1
+                elemj2[j2] = 1
+
                 exp1 = elem1[j1]
                 exp2 = elem2[j2]
+
                 i = self.it(i1,j1)
                 j = self.it(i2,j2)
-                if j1 == j2:
-                    full_exp = exp1 + exp2 - 2
-                    if full_exp // 2 == 0:
-                        if j1 == 0 and ((elem1[1]+elem2[1]) // 2 == 0) and ((elem1[2]+elem2[2]) // 2 == 0):
-                            element += (C[i,j]*(8*exp1*exp2*(limits[0]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[2]+elem2[2]+1)))
-                        elif j1 == 1 and ((elem1[0]+elem2[0]) // 2 == 0) and ((elem1[2]+elem2[2]) // 2 == 0):
-                            element += (C[i,j]*(8*exp1*exp2*(limits[1]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[0]+elem2[0]+1)*(elem1[2]+elem2[2]+1)))
-                        elif j1 == 2  and ((elem1[1]+elem2[1]) // 2 == 0) and ((elem1[0]+elem2[0]) // 2 == 0): 
-                            element += (C[i,j]*(8*exp1*exp2*(limits[2]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[0]**(elem1[0]+elem2[0]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[0]+elem2[0]+1)))
-                        else:
-                            element += 0
-                    else: 
-                        element += 0
-                else:
-                    if j1 == 0: 
-                        if j2 == 1:
-                            if (exp1+elem2[0]-1) // 2 == 0 and ((elem1[1]+exp2-1) // 2 == 0) and ((elem1[2]+elem2[2]) // 2 == 0):
-                                element += (C[i,j]*(8*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[0])*(elem1[1]+exp2)*(elem1[2]+elem2[2]+1)))
-                            else: 
-                                element += 0
-                        else: 
-                            if (exp1+elem2[0]-1) // 2 == 0 and ((elem1[2]+exp2-1) // 2 == 0) and ((elem1[1]+elem2[1]) // 2 == 0):
-                                element += (C[i,j]*(8*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[2]**(elem1[2]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[0])*(elem1[2]+exp2)*(elem1[1]+elem2[1]+1)))
-                            else: 
-                                element += 0
-                    elif j1 == 1:
-                        if j2 == 0:
-                            if (exp1+elem2[1]-1) // 2 == 0 and ((elem1[0]+exp2-1) // 2 == 0) and ((elem1[2]+elem2[2]) // 2 == 0):
-                                element += (C[i,j]*(8*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[1])*(elem1[0]+exp2)*(elem1[2]+elem2[2]+1)))
-                            else: 
-                                element += 0
-                        else: 
-                            if (exp1+elem2[1]-1) // 2 == 0 and ((elem1[2]+exp2-1) // 2 == 0) and ((elem1[0]+elem2[0]) // 2 == 0):
-                                element += (C[i,j]*(8*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[2]**(elem1[2]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[1])*(elem1[2]+exp2)*(elem1[0]+elem2[0]+1)))
-                            else: 
-                                element += 0 
+
+                exps = elem1 + elem2 + 1 - elemj1 - elemj2
+                coef = (1-(-1)**exps[0])*(1-(-1)**exps[1])*(1-(-1)**exps[2])
+
+                if coef != 0:
+
+                    if j1 == j2:
+                        full_exp = exp1 + exp2 - 2
+
+                        if j1 == 0 :
+                            element += (C[i,j]*(coef*exp1*exp2*(limits[0]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[2]+elem2[2]+1)))
+                        
+                        elif j1 == 1 :
+                            element += (C[i,j]*(coef*exp1*exp2*(limits[1]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[0]+elem2[0]+1)*(elem1[2]+elem2[2]+1)))
+                        
+                        elif j1 == 2 : 
+                            element += (C[i,j]*(coef*exp1*exp2*(limits[2]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[0]**(elem1[0]+elem2[0]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[0]+elem2[0]+1)))
+
                     else:
-                        if j2 == 0:
-                            if (exp1+elem2[2]-1) // 2 == 0 and ((elem1[0]+exp2-1) // 2 == 0 )and ((elem1[1]+elem2[1]) // 2 == 0):
-                                element += (C[i,j]*(8*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[0]**(elem1[0]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[2])*(elem1[0]+exp2)*(elem1[1]+elem2[1]+1)))
+
+                        if j1 == 0: 
+
+                            if j2 == 1:
+                                element += (C[i,j]*(coef*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[0])*(elem1[1]+exp2)*(elem1[2]+elem2[2]+1)))
+
                             else: 
-                                element += 0
-                        else: 
-                            if (exp1+elem2[2]-1) // 2 == 0 and ((elem1[1]+exp2-1) // 2 == 0) and ((elem1[0]+elem2[0]) // 2 == 0):
-                                element += (C[i,j]*(8*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[1]**(elem1[1]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[2])*(elem1[1]+exp2)*(elem1[0]+elem2[0]+1)))
+                                element += (C[i,j]*(coef*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[2]**(elem1[2]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[0])*(elem1[2]+exp2)*(elem1[1]+elem2[1]+1)))
+
+                        elif j1 == 1:
+
+                            if j2 == 0:
+                                element += (C[i,j]*(coef*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[1])*(elem1[0]+exp2)*(elem1[2]+elem2[2]+1)))
+
                             else: 
-                                element += 0 
+                                element += (C[i,j]*(coef*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[2]**(elem1[2]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[1])*(elem1[2]+exp2)*(elem1[0]+elem2[0]+1)))
+
+                        else:
+
+                            if j2 == 0:
+                                element += (C[i,j]*(coef*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[0]**(elem1[0]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[2])*(elem1[0]+exp2)*(elem1[1]+elem2[1]+1)))
+
+                            else: 
+                                element += (C[i,j]*(coef*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[1]**(elem1[1]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[2])*(elem1[1]+exp2)*(elem1[0]+elem2[0]+1)))
+
+                else: 
+                    element += 0
+
         return element
 
     def calc_eigenvals(self,G,E):

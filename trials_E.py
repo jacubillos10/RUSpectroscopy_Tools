@@ -2,33 +2,52 @@ import numpy as np
 import scipy.integrate as it 
 from tqdm import tqdm 
 
-def construct_E_from_int(E_int):
-        """
-        Matrix E constructor. Constructs the final matrix E from the reduced version of the matrix already integrated.
+def construct_elem_E(elem1,elem2,limits):
+    np.set_printoptions(linewidth=700)
+    alfa = elem1[0]
+    alfap = elem2[0]
+    beta = elem1[1]
+    betap = elem2[1]
+    delta = elem1[2]
+    deltap = elem2[2]
 
-        @Input:
-         E_int <np.array<np.array<int>>>:  A numpy array that holds a reduced version of the information of the volume integral 
-         for the product of phi with phi trasposed (phi: the expansion of the base functions represented with indexes).
+    exp1 = alfa+alfap+1
+    exp2 = beta+betap+1
+    exp3 = delta+deltap+1
 
-        @Output:
-         E <np.array<np.array<int>>>: A numpy array that holds the information of the volume integral for the 
-         product of phi with phi trasposed (phi: the expansion of the base functions represented with indexes). 
-        """
+    coef = (1 - (-1)**exp1)*(1 - (-1)**exp2)*(1 - (-1)**exp3)
+    if  coef != 0 :
+        element = (coef*(limits[0]**(exp1))*(limits[1]**(exp2))*(limits[2]**(exp3)))/((exp1)*(exp2)*(exp3))
+    else: 
+        element = 0
+
+    return element
+
+def construct_E_from_red(E_int):
+        
         N = len(E_int)
         zero_aux = np.zeros([N])
         E = np.array([])
-        for i in tqdm(range(N)):
+
+        for i in range(N):
+
             row = np.concatenate((E_int[i],zero_aux,zero_aux))
+
             if i == 0:
                 E = np.hstack((E,row))
             else:
                 E = np.vstack((E,row))
-        for i in tqdm(range(N)):
+        
+        for i in range(N):
+
             row = np.concatenate((zero_aux,E_int[i],zero_aux))
             E = np.vstack((E,row))
-        for i in tqdm(range(N)):
+        
+        for i in range(N):
+
             row = np.concatenate((zero_aux,zero_aux,E_int[i]))
             E = np.vstack((E,row))
+
         return E
 
 def generar_tuplas(N,limits):
@@ -40,43 +59,21 @@ def generar_tuplas(N,limits):
     indices_filtrados = np.where(i + j + k <= N)
     # Obtener las tuplas correspondientes a los índices filtrados
     phi = np.vstack([i[indices_filtrados], j[indices_filtrados], k[indices_filtrados]]).T 
-    n1 = len(phi)
-    E = np.array([])
-    for i in tqdm(range(n1)):
-        for j in range(n1):
-            whole = np.concatenate((phi[i],phi[j]))
-            if i == 0 and j == 0:
-                E = np.hstack((E,np.array(whole)))
-            else:
-                E = np.vstack((E,np.array(whole)))
-    n = len(E)
-    n_i = len(E[0])
-    E_int = np.array([])
-    row = np.array([])
-    for i in tqdm(range(n)):
-        exps = []
-        l=0
-        for j in range(n_i):
-            exps.append(E[i,j])
-        p = exps[0]+exps[3]
-        q = exps[1]+exps[4]
-        r = exps[2]+exps[5]
+    R = len(phi)
+    E_red = np.zeros((R,R))
+    for i1 in range(3):
+        for i2 in range(3):
+            for p in range(R):
+                for q in range(R):
+                    elem1 = phi[p]
+                    elem2 = phi[q]
+                    E_red[p,q] = construct_elem_E(elem1,elem2,limits)
 
-        result = (8*(limits[0]**(p+1))*(limits[1]**(q+1))*(limits[2]**(r+1)))/((p+1)*(q+1)*(r+1))
-            
-        row = np.append(row,result)
-        if len(row) == n1 and i == n1- 1:
-            E_int = np.hstack((E_int,row))
-            row = np.delete(row,[range(n1)])
-        elif len(row) == n1:
-            E_int = np.vstack((E_int,row))
-            row = np.delete(row,[range(n1)])
-    W = np.linalg.eigvalsh(E_int)
+    W = np.linalg.eigvalsh(E_red)
     print(np.all(W>=0))
-    print(np.linalg.norm(E_int-E_int.T))
+    print(np.linalg.norm(E_red-E_red.T))
     print(W)
-    exit()
-    E = construct_E_from_int(E_int)
+    E = construct_E_from_red(E_red)
     return E
 
 # Ejemplo de uso
@@ -84,7 +81,8 @@ N = int(input("Ingrese un entero N: "))
 l = list(map(float,input("Ingrese las medidas del paralelepipedo separadas por comas: ").strip().split(",")))
 limits = np.array(l)
 tuplas = generar_tuplas(N,limits)
-p
+print(tuplas)
+
 """
 f = lambda x,y,z: x**(exps[0]+exps[3]) * y**(exps[1]+exps[4]) * z**(exps[2]+exps[5])
         result = it.tplquad(f,-1,1,-1,1,-1,1,epsabs=1.49e-2,epsrel=1.49e-2)

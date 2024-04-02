@@ -16,7 +16,7 @@ def it_c(i,j):
         index = i
     else:
         index = 6 - (i + j)
-         
+
     return index
 
 def construct_full_phi(phi):
@@ -33,55 +33,58 @@ def construct_elem_G(elem1, elem2, i1, i2, limits, C):
     element = 0
     for j1 in range(3):
         for j2 in range(3):
+            elemj1 = np.zeros(3)
+            elemj2 = np.zeros(3)
+            elemj1[j1] = 1
+            elemj2[j2] = 1
             exp1 = elem1[j1]
             exp2 = elem2[j2]
-            if j1 == j2:
-                full_exp = exp1 + exp2 - 2
-                if full_exp // 2 == 0:
-                    if j1 == 0 and ((elem1[1]+elem2[1]) // 2 == 0) and ((elem1[2]+elem2[2]) // 2 == 0):
-                        element += (C[it_c(i1,j1),it_c(i2,j2)]*(8*exp1*exp2*(limits[0]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[2]+elem2[2]+1)))
-                    elif j1 == 1 and ((elem1[0]+elem2[0]) // 2 == 0) and ((elem1[2]+elem2[2]) // 2 == 0):
-                        element += (C[it_c(i1,j1),it_c(i2,j2)]*(8*exp1*exp2*(limits[1]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[0]+elem2[0]+1)*(elem1[2]+elem2[2]+1)))
-                    elif j1 == 2  and ((elem1[1]+elem2[1]) // 2 == 0) and ((elem1[0]+elem2[0]) // 2 == 0): 
-                        element += (C[it_c(i1,j1),it_c(i2,j2)]*(8*exp1*exp2*(limits[2]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[0]**(elem1[0]+elem2[0]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[0]+elem2[0]+1)))
-                    else:
-                        element += 0
-                else: 
-                    element += 0
-            else:
-                if j1 == 0: 
-                    if j2 == 1:
-                        if (exp1+elem2[0]-1) // 2 == 0 and ((elem1[1]+exp2-1) // 2 == 0) and ((elem1[2]+elem2[2]) // 2 == 0):
-                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(8*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[0])*(elem1[1]+exp2)*(elem1[2]+elem2[2]+1)))
-                        else: 
-                            element += 0
-                    else: 
-                        if (exp1+elem2[0]-1) // 2 == 0 and ((elem1[2]+exp2-1) // 2 == 0) and ((elem1[1]+elem2[1]) // 2 == 0):
-                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(8*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[2]**(elem1[2]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[0])*(elem1[2]+exp2)*(elem1[1]+elem2[1]+1)))
-                        else: 
-                            element += 0
-                elif j1 == 1:
-                    if j2 == 0:
-                        if (exp1+elem2[1]-1) // 2 == 0 and ((elem1[0]+exp2-1) // 2 == 0) and ((elem1[2]+elem2[2]) // 2 == 0):
-                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(8*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[1])*(elem1[0]+exp2)*(elem1[2]+elem2[2]+1)))
-                        else: 
-                            element += 0
-                    else: 
-                        if (exp1+elem2[1]-1) // 2 == 0 and ((elem1[2]+exp2-1) // 2 == 0) and ((elem1[0]+elem2[0]) // 2 == 0):
-                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(8*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[2]**(elem1[2]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[1])*(elem1[2]+exp2)*(elem1[0]+elem2[0]+1)))
-                        else: 
-                            element += 0 
+
+            exps = elem1 + elem2 + 1 - elemj1 - elemj2
+            coef = (1-(-1)**exps[0])*(1-(-1)**exps[1])*(1-(-1)**exps[2])
+
+            if coef != 0:
+
+                if j1 == j2:
+                    full_exp = exp1 + exp2 - 2
+
+                    if j1 == 0 :
+                        element += (C[it_c(i1,j1),it_c(i2,j2)]*(coef*exp1*exp2*(limits[0]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[2]+elem2[2]+1)))
+                    
+                    elif j1 == 1 :
+                        element += (C[it_c(i1,j1),it_c(i2,j2)]*(coef*exp1*exp2*(limits[1]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[0]+elem2[0]+1)*(elem1[2]+elem2[2]+1)))
+                    
+                    elif j1 == 2 : 
+                        element += (C[it_c(i1,j1),it_c(i2,j2)]*(coef*exp1*exp2*(limits[2]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[0]**(elem1[0]+elem2[0]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[0]+elem2[0]+1)))
+
                 else:
-                    if j2 == 0:
-                        if (exp1+elem2[2]-1) // 2 == 0 and ((elem1[0]+exp2-1) // 2 == 0 )and ((elem1[1]+elem2[1]) // 2 == 0):
-                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(8*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[0]**(elem1[0]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[2])*(elem1[0]+exp2)*(elem1[1]+elem2[1]+1)))
+
+                    if j1 == 0: 
+
+                        if j2 == 1:
+                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(coef*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[0])*(elem1[1]+exp2)*(elem1[2]+elem2[2]+1)))
+
                         else: 
-                            element += 0
-                    else: 
-                        if (exp1+elem2[2]-1) // 2 == 0 and ((elem1[1]+exp2-1) // 2 == 0) and ((elem1[0]+elem2[0]) // 2 == 0):
-                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(8*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[1]**(elem1[1]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[2])*(elem1[1]+exp2)*(elem1[0]+elem2[0]+1)))
+                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(coef*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[2]**(elem1[2]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[0])*(elem1[2]+exp2)*(elem1[1]+elem2[1]+1)))
+
+                    elif j1 == 1:
+
+                        if j2 == 0:
+                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(coef*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[1])*(elem1[0]+exp2)*(elem1[2]+elem2[2]+1)))
+
                         else: 
-                            element += 0 
+                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(coef*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[2]**(elem1[2]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[1])*(elem1[2]+exp2)*(elem1[0]+elem2[0]+1)))
+
+                    else:
+
+                        if j2 == 0:
+                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(coef*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[0]**(elem1[0]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[2])*(elem1[0]+exp2)*(elem1[1]+elem2[1]+1)))
+
+                        else: 
+                            element += (C[it_c(i1,j1),it_c(i2,j2)]*(coef*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[1]**(elem1[1]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[2])*(elem1[1]+exp2)*(elem1[0]+elem2[0]+1)))
+
+            else: 
+                element += 0
     return element
 
 
