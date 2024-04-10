@@ -18,9 +18,6 @@ class base:
     Methods: 
      __init__: Initialization method. N and type must be specified.
      calc_phi: Calculate the phi array based on the order N.
-     get_type: Returns the user the name of the base functions that are being used.
-     get_N: Returns the user the maximum order in the base funcions.
-     get_phi: Returns the user the phi array. 
     """
 
     def __init__(self,N,type):
@@ -99,7 +96,7 @@ class Forward:
      A np.array<np.array<float>>: Numpy array with the eigenvectors (in form of a numpy array aswell) of the problem. 
      The ith eigenvector corresponds to the vector associated to the ith eigen value in the organized w2 array. This vectors correspond 
      phisically to the ways it oscillates in terms of the directions (x,y,z).
-     Amps np.array<float>: Numpy array with th amplitudes of the eigenvectors of the problem. Phisically, this values correspond to the 
+     Amps np.array<float>: Numpy array with the amplitudes of the eigenvectors of the problem. Phisically, this values correspond to the 
      amplitude of the oscilations (amplitude of teh eigenvectors).
 
     Methods: 
@@ -108,9 +105,10 @@ class Forward:
      calc_G: Method that calculates and does the volume integral for each of the values of the matrix Gamma.
      calc_eigenvals: Method that solves the generalized eigenvalue problem for the specified E, G and rho.
      construct_E_from_red: Constructs the final matrix E from the reduced version of the matrix already integrated.
-     construct_full_phi: This function constructs the full matrix phi based on the reduced phi.
-     derivation_PHI: This function derivates de phi matrix according to the derivation and cross product presented by Felipe 
-     Giraldo in his thesis work.
+     construct_elem_E: Constructs a single element for the matrix E.
+     construct_elem_G: Constructs a single element for the matrix G.
+     it: Changes the double index convention for single index convention in the elastic constant matrix C.
+
     """
 
     def __init__(self,N,type,shape,system,limits,rho,C):
@@ -137,10 +135,10 @@ class Forward:
         Matrix E constructor. Constructs the final matrix E from the reduced version of the matrix already integrated.
 
         @Input:
-         E_int <np.array<np.array<int>>>:  A numpy array that holds a reduced version of the E matrix.
+         E_int <np.array<np.array<float>>>:  A numpy array that holds a reduced version of the E matrix.
 
         @Output:
-         E <np.array<np.array<int>>>: A numpy array that corresponds to the kinetic energy term of the Lagrangian 
+         E <np.array<np.array<float>>>: A numpy array that corresponds to the kinetic energy term of the Lagrangian 
          of the problem obtained with the volume integral of the product of the array phi with phi transposed 
          (phi: The expansion of the base functions represented with indexes). 
         """
@@ -170,6 +168,17 @@ class Forward:
         return E
     
     def construct_elem_E(self,elem1,elem2,limits):
+        """
+        Constructs a single element for the matrix E.
+
+        @Input: 
+         elem1 <np.array<int>>: Element 1 of the phi matrix taken into account for the calculation of the element Epq 
+         elem2 <np.array<int>>: Element 2 of the phi matrix taken into account for the calculation of the element Epq 
+         limits <np.array<float>>: Numpy array with the dimensions of the sample
+        
+        @Output:
+         element <float>: Numerical value for a part of the element Epq for matrix E after integration of the element.
+        """
         np.set_printoptions(linewidth=700)
         alfa = elem1[0]
         alfap = elem2[0]
@@ -192,11 +201,11 @@ class Forward:
     
     def calc_E(self):
         """
-        Matrix E calculator. Calculates and returns the matrix E that corresponds the kinetic term of the Lagrangian of 
-        the problem. 
+        Matrix E calculator. Sums up all of the Epq elements to construct the E matrix. This corresponds the kinetic term 
+        of the Lagrangian of the problem. 
 
         @Output:
-         E <np.array<np.array<int>>>: A numpy array that corresponds to the kinetic energy term of the Lagrangian 
+         E <np.array<np.array<float>>>: A numpy array that corresponds to the kinetic energy term of the Lagrangian 
          of the problem obtained with the volume integral of the product of the array phi with phi transposed 
          (phi: The expansion of the base functions represented with indexes). 
         """
@@ -206,25 +215,40 @@ class Forward:
         phi = base.phi
         R = len(phi)
         E_red = np.zeros((R,R))
-        for i1 in range(3):
+
+        for i1 in tqdm(range(3)):
             for i2 in range(3):
                 for p in range(R):
                     for q in range(R):
                         elem1 = phi[p]
                         elem2 = phi[q]
                         E_red[p,q] = self.construct_elem_E(elem1,elem2,limits)
-
-        E = self.construct_E_from_red(E_red)
-
+        w2,U = np.linalg.eigh(E_red)
+        thresh = 10**(-9)
+        if np.all(w2>=thresh):
+            E = self.construct_E_from_red(E_red)
+        else: 
+            w2_adjusted = np.array([])
+            for w in w2:
+                if w < thresh and w >= -thresh:
+                    w = np.abs(w)
+                elif w < -thresh:
+                    print("ERROR")
+                    exit
+                w2_adjusted = np.append(w2_adjusted,w)
+            w2 = np.diag(w2_adjusted)
+            E_red_new = U @ w2 @ U.T
+            E = self.construct_E_from_red(E_red_new)
         return E
     
     
     def calc_G(self):
         """
-        Matrix G calculator. 
+        Matrix G calculator. Sums up all of the Gpq elements to construct the G matrix. This corresponds to the potential
+        energy term of the Lagrangian of the problem.
 
         @Output:
-         G <np.array<np.array<int>>>: A numpy array that coresponds to the potential energy term of the Lagrangian 
+         G <np.array<np.array<float>>>: A numpy array that coresponds to the potential energy term of the Lagrangian 
          of the problem obtained with the volume integral of the matrix product amongst Phi transposed, B transposed, 
          C, B, and Phi (Phi: The matrix with the expansion of the base functions represented with indexes, B: The 
          derivation matrix taken from Felipe Giraldo's thesis work, C: The elastic constants matrix).
@@ -250,7 +274,7 @@ class Forward:
     def it(self,i,j):
 
         """
-        This function changes the double index convention for single index convention in the elastic constant matrix C.
+        Changes the double index convention for single index convention in the elastic constant matrix C.
         00 is changed to 0, 11 is changed to 1, 22 is changed to 2, 
         01 or 10 is changed to 5
         02 or 20 is changed to 4
@@ -267,7 +291,21 @@ class Forward:
         return index
 
     def construct_elem_G(self, elem1, elem2, i1, i2, limits, C):
+        """
+        Constructs a single element for the matrix G.
+
+        @Input: 
+         elem1 <np.array<int>>: Element 1 of the phi matrix taken into account for the calculation of the element Gpq 
+         elem2 <np.array<int>>: Element 2 of the phi matrix taken into account for the calculation of the element Gpq 
+         i1 <int>: Index i for the calculations of the elastic constants for element 1.
+         i2 <int>: Index i for the calculations of the elastic constants for element 2.
+         limits <np.array<float>>: Numpy array with the dimensions of the sample
+         C <np.array<np.array<float>>>: Numpy array matrix equivalent to the elastic moduli of the sample.
         
+        @Output:
+         element <float>: Numerical value for a part of the element Gpq for matrix G after integration of the element.
+        
+        """
         element = 0
         for j1 in range(3):
             for j2 in range(3):
@@ -339,11 +377,11 @@ class Forward:
         the directions (x,y,z) (eigenvectors) and the amplitude of the oscilations. 
 
         @Input:
-         G <np.array<np.array<int>>>: A numpy array that coresponds to the potential energy term of the Lagrangian 
+         G <np.array<np.array<float>>>: A numpy array that coresponds to the potential energy term of the Lagrangian 
          of the problem obtained with the volume integral of the matrix product amongst Phi transposed, B transposed, 
          C, B, and Phi (Phi: The matrix with the expansion of the base functions represented with indexes, B: The 
          derivation matrix taken from Felipe Giraldo's thesis work, C: The elastic constants matrix).
-         E <np.array<np.array<int>>>: A numpy array that corresponds to the kinetic energy term of the Lagrangian 
+         E <np.array<np.array<float>>>: A numpy array that corresponds to the kinetic energy term of the Lagrangian 
          of the problem obtained with the volume integral of the product of the array phi with phi transposed 
          (phi: The expansion of the base functions represented with indexes).
         
@@ -360,11 +398,23 @@ class Forward:
         amps = np.array([])
 
         #Solving the generalized eigenvalue problem 
-        w2 , a = solve.eigh(a=G,b=E)
+        w2 , A = solve.eigh(a=G,b=E)
+        thresh = 10**(-9)
+        if not(np.all(w2 >= thresh)):
+            w2_adjusted = np.array([])
+            for w in w2:
+                if w < thresh and w >= -thresh:
+                    w = np.abs(w)
+                elif w < -thresh:
+                    print("ERROR")
+                    print(w)
+                    exit
+                w2_adjusted = np.append(w2_adjusted,w)
 
+        w2 = w2_adjusted
         #Calculating the amplitudes
-        for elem in a: 
+        for elem in A: 
             amp = solve.norm(elem)
             amps = np.append(amps,amp)
         
-        return w2, a, amps
+        return w2, A, amps
