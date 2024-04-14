@@ -52,9 +52,9 @@ def generate_term_in_ſ(exp_index1, exp_index2, i1, i2, j1, j2, C, geo_par):
     if Q == 0:
         return 0
     #fin if 
-    P = (C[it_c(i1,j1),it_c(i2,j2)]/geo_par[j1]*geo_par[j2])
+    P = C[it_c(i1,j1),it_c(i2,j2)]/(geo_par[j1]*geo_par[j2])
     R = (exp_index1[j1]*exp_index2[j2])/(coeff[0]*coeff[1]*coeff[2])
-    return P*Q*R
+    return 4*P*Q*R
 #fin función    
 
 @njit("f8(i8,i8,i8[:],i8[:],f8[:,:],f8[:])")
