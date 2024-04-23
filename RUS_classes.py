@@ -4,6 +4,8 @@ import math
 from sympy import *
 import scipy.linalg as solve
 from tqdm import tqdm
+from scipy.special import factorial2
+
 
 class base:
     """
@@ -167,7 +169,7 @@ class Forward:
 
         return E
     
-    def construct_elem_E(self,elem1,elem2,limits):
+    def construct_elem_E(self,elem1,elem2,limits,shape):
         """
         Constructs a single element for the matrix E.
 
@@ -192,8 +194,20 @@ class Forward:
         exp3 = delta+deltap+1
 
         coef = (1 - (-1)**exp1)*(1 - (-1)**exp2)*(1 - (-1)**exp3)
-        if  coef != 0 :
+        if  coef != 0 and shape == 'rectangular_p':
             element = (coef*(limits[0]**(exp1))*(limits[1]**(exp2))*(limits[2]**(exp3)))/((exp1)*(exp2)*(exp3))
+        elif coef != 0 and shape == 'cylinder':
+            p2fac = factorial2((exp1-2))
+            q2fac = factorial2((exp2-2))
+            pr2fac = factorial2((exp1 + exp2))
+            element = (4*np.pi*(limits[0]**(exp1))*(limits[1]**(exp2))*(limits[2]**(exp3))*(p2fac)*(q2fac))/((exp3)*(pr2fac))
+        elif coef != 0 and shape == 'cone':
+            p2fac = factorial2((exp1-2))
+            q2fac = factorial2((exp2-2))
+            pr2fac = factorial2((exp1 + exp2))
+            element = (2*np.pi*(limits[0]**(exp1))*(limits[1]**(exp2))*(limits[2]**(exp3))*(p2fac)*(q2fac))/((exp1 + exp2 + exp3)*(pr2fac))
+        elif coef != 0 and shape == 'pyramid':
+            element = (4*(limits[0]**(exp1))*(limits[1]**(exp2))*(limits[2]**(exp3)))/((exp1 + exp2 + exp3)*(exp1)*(exp2))
         else: 
             element = 0
 
@@ -212,6 +226,7 @@ class Forward:
         base = self.base
         sample = self.sample
         limits = sample.limits
+        shape = sample.shape
         phi = base.phi
         R = len(phi)
         E_red = np.zeros((R,R))
@@ -222,7 +237,7 @@ class Forward:
                     for q in range(R):
                         elem1 = phi[p]
                         elem2 = phi[q]
-                        E_red[p,q] = self.construct_elem_E(elem1,elem2,limits)
+                        E_red[p,q] = self.construct_elem_E(elem1,elem2,limits,shape)
         w2,U = np.linalg.eigh(E_red)
         thresh = 10**(-9)
         if np.all(w2>=thresh):
@@ -257,6 +272,7 @@ class Forward:
         np.set_printoptions(linewidth=700)
         base = self.base
         sample = self.sample
+        shape = sample.shape
         C = sample.C
         limits = sample.limits
         phi = base.phi
@@ -268,7 +284,7 @@ class Forward:
                     for q in range(R):
                         elem1 = phi[p]
                         elem2 = phi[q]
-                        G[i1*R+p,i2*R+q] = self.construct_elem_G(elem1,elem2,i1,i2,limits,C)
+                        G[i1*R+p,i2*R+q] = self.construct_elem_G(elem1,elem2,i1,i2,limits,C,shape)
         return G
     
     def it(self,i,j):
@@ -290,7 +306,7 @@ class Forward:
             index = 6 - (i + j)
         return index
 
-    def construct_elem_G(self, elem1, elem2, i1, i2, limits, C):
+    def construct_elem_G(self, elem1, elem2, i1, i2, limits, C, shape):
         """
         Constructs a single element for the matrix G.
 
@@ -324,17 +340,16 @@ class Forward:
                 exps = elem1 + elem2 + 1 - elemj1 - elemj2
                 coef = (1-(-1)**exps[0])*(1-(-1)**exps[1])*(1-(-1)**exps[2])
 
-                if coef != 0:
+                if coef != 0 and shape == 'rectangular_p':
 
                     if j1 == j2:
+
                         full_exp = exp1 + exp2 - 2
 
                         if j1 == 0 :
-                            element += (C[i,j]*(coef*exp1*exp2*(limits[0]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[2]+elem2[2]+1)))
-                        
+                            element += (C[i,j]*(coef*exp1*exp2*(limits[0]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[2]+elem2[2]+1)))                      
                         elif j1 == 1 :
-                            element += (C[i,j]*(coef*exp1*exp2*(limits[1]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[0]+elem2[0]+1)*(elem1[2]+elem2[2]+1)))
-                        
+                            element += (C[i,j]*(coef*exp1*exp2*(limits[1]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+elem2[2]+1)))/((full_exp+1)*(elem1[0]+elem2[0]+1)*(elem1[2]+elem2[2]+1)))                       
                         elif j1 == 2 : 
                             element += (C[i,j]*(coef*exp1*exp2*(limits[2]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[0]**(elem1[0]+elem2[0]+1)))/((full_exp+1)*(elem1[1]+elem2[1]+1)*(elem1[0]+elem2[0]+1)))
 
@@ -344,7 +359,6 @@ class Forward:
 
                             if j2 == 1:
                                 element += (C[i,j]*(coef*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[0])*(elem1[1]+exp2)*(elem1[2]+elem2[2]+1)))
-
                             else: 
                                 element += (C[i,j]*(coef*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[2]**(elem1[2]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[0])*(elem1[2]+exp2)*(elem1[1]+elem2[1]+1)))
 
@@ -352,7 +366,6 @@ class Forward:
 
                             if j2 == 0:
                                 element += (C[i,j]*(coef*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1)))/((exp1+elem2[1])*(elem1[0]+exp2)*(elem1[2]+elem2[2]+1)))
-
                             else: 
                                 element += (C[i,j]*(coef*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[2]**(elem1[2]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[1])*(elem1[2]+exp2)*(elem1[0]+elem2[0]+1)))
 
@@ -360,10 +373,195 @@ class Forward:
 
                             if j2 == 0:
                                 element += (C[i,j]*(coef*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[0]**(elem1[0]+exp2))*(limits[1]**(elem1[1]+elem2[1]+1)))/((exp1+elem2[2])*(elem1[0]+exp2)*(elem1[1]+elem2[1]+1)))
-
                             else: 
                                 element += (C[i,j]*(coef*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[1]**(elem1[1]+exp2))*(limits[0]**(elem1[0]+elem2[0]+1)))/((exp1+elem2[2])*(elem1[1]+exp2)*(elem1[0]+elem2[0]+1)))
+                
+                elif coef != 0 and shape == 'cylinder':
 
+                    if j1 == j2:
+
+                        full_exp = exp1 + exp2 - 2
+
+                        if j1 == 0 :
+                            p2fac = factorial2(exp1+exp2-3)
+                            q2fac = factorial2(elem1[1]+elem2[1]-1)
+                            pq2fac = factorial2(exp1+exp2+elem1[1]+elem2[1])
+                            element += (C[i,j]*(4*np.pi*exp1*exp2*(limits[0]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+elem2[2]+1))*(p2fac)*(q2fac)))/((elem1[2]+elem2[2]+1)*(pq2fac))
+                        elif j1 == 1 :
+                            p2fac = factorial2(elem1[0]+elem2[0]-1)
+                            q2fac = factorial2(exp1+exp2-3)
+                            pq2fac = factorial2(exp1+exp2+elem1[0]+elem2[0])
+                            element += (C[i,j]*(4*np.pi*exp1*exp2*(limits[1]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+elem2[2]+1))*(p2fac)*(q2fac)))/((elem1[2]+elem2[2]+1)*(pq2fac))                        
+                        elif j1 == 2 : 
+                            p2fac = factorial2(elem1[0]+elem2[0]-1)
+                            q2fac = factorial2(elem1[1]+elem2[1]-1)
+                            pq2fac = factorial2(elem1[1]+elem2[1]+elem1[0]+elem2[0]+2)
+                            element += (C[i,j]*(4*np.pi*exp1*exp2*(limits[2]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(p2fac)*(q2fac)))/((exp1+exp2-1)*(pq2fac))
+
+                    else:
+
+                        if j1 == 0: 
+
+                            if j2 == 1:
+                                p2fac = factorial2(exp1+elem2[0]-2)
+                                q2fac = factorial2(elem1[1]+exp2-2)
+                                pq2fac = factorial2(exp1+exp2+elem1[1]+elem2[0])
+                                element += (C[i,j]*(4*np.pi*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1))*(p2fac)*(q2fac)))/((elem1[2]+elem2[2]+1)*(pq2fac))
+                            else: 
+                                p2fac = factorial2(exp1+elem2[0]-2)
+                                q2fac = factorial2(elem1[1]+elem2[1]-1)
+                                pq2fac = factorial2(exp1+elem2[1]+elem1[1]+elem2[0]+1)
+                                element += (C[i,j]*(4*np.pi*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+exp2))*(p2fac)*(q2fac)))/((elem1[2]+exp2)*(pq2fac))
+
+                        elif j1 == 1:
+
+                            if j2 == 0:
+                                p2fac = factorial2(exp2+elem1[0]-2)
+                                q2fac = factorial2(exp1+elem2[1]-2)
+                                pq2fac = factorial2(exp1+exp2+elem1[0]+elem2[1])
+                                element += (C[i,j]*(4*np.pi*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1))*(p2fac)*(q2fac)))/((elem1[2]+elem2[2]+1)*(pq2fac))
+                            else: 
+                                p2fac = factorial2(elem1[0]+elem2[0]-1)
+                                q2fac = factorial2(exp1+elem2[1]-2)
+                                pq2fac = factorial2(exp1+elem2[1]+elem1[0]+elem2[0]+1)
+                                element += (C[i,j]*(4*np.pi*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+exp2))*(p2fac)*(q2fac)))/((elem1[2]+exp2)*(pq2fac))
+
+                        else:
+
+                            if j2 == 0:
+                                p2fac = factorial2(elem1[0]+exp2-2)
+                                q2fac = factorial2(elem1[1]+elem2[1]-1)
+                                pq2fac = factorial2(exp2+elem1[0]+elem1[1]+elem2[1]+1)
+                                element += (C[i,j]*(4*np.pi*exp1*exp2*(limits[0]**(exp2+elem1[0]))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem2[2]+exp1))*(p2fac)*(q2fac)))/((elem2[2]+exp1)*(pq2fac))
+                            else: 
+                                p2fac = factorial2(elem1[0]+elem2[0]-1)
+                                q2fac = factorial2(exp2+elem1[1]-2)
+                                pq2fac = factorial2(exp2+elem1[1]+elem1[0]+elem2[0]+1)
+                                element += (C[i,j]*(4*np.pi*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[1]**(elem1[1]+exp2))*(p2fac)*(q2fac)))/((elem2[2]+exp1)*(pq2fac))
+                
+                elif coef != 0 and shape == 'cone':
+                     
+                    all_exp_sum = elem1[0]+elem2[0]+elem1[1]+elem2[1]+elem1[2]+elem2[2]
+
+                    if j1 == j2:
+
+                        full_exp = exp1 + exp2 - 2
+
+                        if j1 == 0 :
+                            
+                            p2fac = factorial2(exp1+exp2-3)
+                            q2fac = factorial2(elem1[1]+elem2[1]-1)
+                            pq2fac = factorial2(exp1+exp2+elem1[1]+elem2[1])
+                            element += (C[i,j]*(2*np.pi*exp1*exp2*(limits[0]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+elem2[2]+1))*(p2fac)*(q2fac)))/((all_exp_sum+1)*(pq2fac))                      
+                        elif j1 == 1 :
+                            p2fac = factorial2(elem1[0]+elem2[0]-1)
+                            q2fac = factorial2(exp1+exp2-3)
+                            pq2fac = factorial2(exp1+exp2+elem1[0]+elem2[0])
+                            element += (C[i,j]*(2*np.pi*exp1*exp2*(limits[1]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+elem2[2]+1))*(p2fac)*(q2fac)))/((all_exp_sum+1)*(pq2fac))                        
+                        elif j1 == 2 : 
+                            p2fac = factorial2(elem1[0]+elem2[0]-1)
+                            q2fac = factorial2(elem1[1]+elem2[1]-1)
+                            pq2fac = factorial2(elem1[1]+elem2[1]+elem1[0]+elem2[0]+2)
+                            element += (C[i,j]*(2*np.pi*exp1*exp2*(limits[2]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(p2fac)*(q2fac)))/((all_exp_sum+1)*(pq2fac))
+
+                    else:
+
+                        if j1 == 0: 
+
+                            if j2 == 1:
+                                p2fac = factorial2(exp1+elem2[0]-2)
+                                q2fac = factorial2(elem1[1]+exp2-2)
+                                pq2fac = factorial2(exp1+exp2+elem1[1]+elem2[0])
+                                element += (C[i,j]*(2*np.pi*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1))*(p2fac)*(q2fac)))/((all_exp_sum+1)*(pq2fac))
+                            else: 
+                                p2fac = factorial2(exp1+elem2[0]-2)
+                                q2fac = factorial2(elem1[1]+elem2[1]-1)
+                                pq2fac = factorial2(exp1+elem2[1]+elem1[1]+elem2[0]+1)
+                                element += (C[i,j]*(2*np.pi*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+exp2))*(p2fac)*(q2fac)))/((all_exp_sum+1)*(pq2fac))
+
+                        elif j1 == 1:
+
+                            if j2 == 0:
+                                p2fac = factorial2(exp2+elem1[0]-2)
+                                q2fac = factorial2(exp1+elem2[1]-2)
+                                pq2fac = factorial2(exp1+exp2+elem1[0]+elem2[1])
+                                element += (C[i,j]*(2*np.pi*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1))*(p2fac)*(q2fac)))/((all_exp_sum+1)*(pq2fac))
+                            else: 
+                                p2fac = factorial2(elem1[0]+elem2[0]-1)
+                                q2fac = factorial2(exp1+elem2[1]-2)
+                                pq2fac = factorial2(exp1+elem2[1]+elem1[0]+elem2[0]+1)
+                                element += (C[i,j]*(2*np.pi*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+exp2))*(p2fac)*(q2fac)))/((all_exp_sum+1)*(pq2fac))
+
+                        else:
+
+                            if j2 == 0:
+                                p2fac = factorial2(elem1[0]+exp2-2)
+                                q2fac = factorial2(elem1[1]+elem2[1]-1)
+                                pq2fac = factorial2(exp2+elem1[0]+elem1[1]+elem2[1]+1)
+                                element += (C[i,j]*(2*np.pi*exp1*exp2*(limits[0]**(exp2+elem1[0]))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem2[2]+exp1))*(p2fac)*(q2fac)))/((all_exp_sum+1)*(pq2fac))
+                            else: 
+                                p2fac = factorial2(elem1[0]+elem2[0]-1)
+                                q2fac = factorial2(exp2+elem1[1]-2)
+                                pq2fac = factorial2(exp2+elem1[1]+elem1[0]+elem2[0]+1)
+                                element += (C[i,j]*(2*np.pi*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[1]**(elem1[1]+exp2))*(p2fac)*(q2fac)))/((all_exp_sum+1)*(pq2fac))
+                          
+                elif coef != 0 and shape == 'pyramid':
+                     
+                    all_exp_sum = elem1[0]+elem2[0]+elem1[1]+elem2[1]+elem1[2]+elem2[2]
+
+                    if j1 == j2:
+
+                        full_exp = exp1 + exp2 - 2
+
+                        if j1 == 0 :
+                            
+                            p2fac = (exp1+exp2-3)
+                            q2fac = (elem1[1]+elem2[1]-1)
+                            element += (C[i,j]*(4*exp1*exp2*(limits[0]**(full_exp+1))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+elem2[2]+1))))/((all_exp_sum+1)*(p2fac)*(q2fac))                      
+                        elif j1 == 1 :
+                            p2fac = (elem1[0]+elem2[0]-1)
+                            q2fac = (exp1+exp2-3)
+                            element += (C[i,j]*(4*exp1*exp2*(limits[1]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+elem2[2]+1))))/((all_exp_sum+1)*(p2fac)*(q2fac))                        
+                        elif j1 == 2 : 
+                            p2fac = (elem1[0]+elem2[0]-1)
+                            q2fac = (elem1[1]+elem2[1]-1)
+                            element += (C[i,j]*(4*exp1*exp2*(limits[2]**(full_exp+1))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[0]**(elem1[0]+elem2[0]+1))))/((all_exp_sum+1)*(p2fac)*(q2fac))
+
+                    else:
+
+                        if j1 == 0: 
+
+                            if j2 == 1:
+                                p2fac = (exp1+elem2[0]-2)
+                                q2fac = (elem1[1]+exp2-2)
+                                element += (C[i,j]*(4*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1))))/((all_exp_sum+1)*(p2fac)*(q2fac))
+                            else: 
+                                p2fac = (exp1+elem2[0]-2)
+                                q2fac = (elem1[1]+elem2[1]-1)
+                                element += (C[i,j]*(4*exp1*exp2*(limits[0]**(exp1+elem2[0]))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem1[2]+exp2))))/((all_exp_sum+1)*(p2fac)*(q2fac))
+
+                        elif j1 == 1:
+
+                            if j2 == 0:
+                                p2fac = (exp2+elem1[0]-2)
+                                q2fac = (exp1+elem2[1]-2)
+                                element += (C[i,j]*(4*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+exp2))*(limits[2]**(elem1[2]+elem2[2]+1))))/((all_exp_sum+1)*(p2fac)*(q2fac))
+                            else: 
+                                p2fac = (elem1[0]+elem2[0]-1)
+                                q2fac = (exp1+elem2[1]-2)
+                                element += (C[i,j]*(4*exp1*exp2*(limits[1]**(exp1+elem2[1]))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[2]**(elem1[2]+exp2))))/((all_exp_sum+1)*(p2fac)*(q2fac))
+
+                        else:
+
+                            if j2 == 0:
+                                p2fac = (elem1[0]+exp2-2)
+                                q2fac = (elem1[1]+elem2[1]-1)
+                                element += (C[i,j]*(4*exp1*exp2*(limits[0]**(exp2+elem1[0]))*(limits[1]**(elem1[1]+elem2[1]+1))*(limits[2]**(elem2[2]+exp1))))/((all_exp_sum+1)*(p2fac)*(q2fac))
+                            else: 
+                                p2fac = (elem1[0]+elem2[0]-1)
+                                q2fac = (exp2+elem1[1]-2)
+                                element += (C[i,j]*(4*exp1*exp2*(limits[2]**(exp1+elem2[2]))*(limits[0]**(elem1[0]+elem2[0]+1))*(limits[1]**(elem1[1]+exp2))))/((all_exp_sum+1)*(p2fac)*(q2fac))
+                
                 else: 
                     element += 0
 
