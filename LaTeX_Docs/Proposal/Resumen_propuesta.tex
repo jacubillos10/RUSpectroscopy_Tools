@@ -6,7 +6,7 @@
 %\usepackage[english]{babel}
 %\usepackage[latin5]{inputenc}
 \usepackage{hyperref}
-\usepackage[left=3cm,top=3cm,right=3cm, bottom=2cm,nohead,nofoot]{geometry}
+\usepackage[left=3cm,top=3cm,right=3cm, bottom=3cm,nohead,nofoot]{geometry}
 \usepackage{braket}
 \usepackage{datenumber}
 \usepackage{amsmath,bm}
@@ -41,18 +41,18 @@ Director: Julián Rincón
 
 \section{Resumen}
 
-Las mediciones ultrasónicas de los materiales han sido valiosas para el estudio de la materia condensada. Estas permiten determinar las constantes elásticas de los materiales, las cuales son de importancia fundamental, ya que son segundas derivadas de la energía libre respecto a la deformación y están directamente relacionadas con la estructura atómica del material. Además, están conectadas a propiedades térmicas de los sólidos mediante la teoría de Debye. Los datos de constantes elásticas, en combinación con mediciones de expansión térmica, también pueden ser usados para determinar la ecuación de estado de varias funciones termodinámicas \cite{Leisure_1997}.
+Las mediciones ultrasónicas de los materiales han sido valiosas para el estudio de la materia condensada. Estas permiten determinar las constantes elásticas de los materiales, las cuales son de importancia fundamental, ya que están directamente relacionadas con la estructura atómica del material. Además, están conectadas a propiedades térmicas de los sólidos mediante la teoría de Debye. Los datos de constantes elásticas, en combinación con mediciones de expansión térmica, también pueden ser usados para determinar la ecuación de estado de varias funciones termodinámicas \cite{Leisure_1997}.
 
 
-Mediante la técnica de la espectroscopía de resonancia ultrasónica (RUS por sus siglas en inglés) se puede obtener las mencionadas constantes elásticas. Esta consiste en colocar una muestra del sólido entre dos transductores piezoeléctricos que lo sostienen ligeramente. La muestra del sólido usualmente tiene formas bien definidas como paralelepípedos regulares o esferas. La muestra es excitada en un punto por uno de los transductores. Este transductor hace un barrido de varias frecuencias donde se encuentran varios modos de vibración de la muestra. Mientras el primer transductor hace oscilar la muestra, la respuesta resonante de esta es detectada por el otro transductor. De esta manera, se observa una respuesta ampliada cuando la frecuencia del primer transductor corresponde con la frecuencia de un modo de vibración propio de la muestra, de acuerdo al sistema cristalino de la muestra \cite{Leisure_1997}. 
+Mediante la técnica de la espectroscopía de resonancia ultrasónica (RUS por sus siglas en inglés) se puede obtener las mencionadas constantes elásticas. Esta consiste en colocar una muestra del sólido entre dos transductores piezoeléctricos que lo sostienen ligeramente. La muestra del sólido usualmente tiene formas bien definidas como paralelepípedos regulares o esferas. La muestra es excitada en un punto por uno de los transductores. Este transductor hace un barrido de varias frecuencias donde se encuentran varios modos de vibración de la muestra. Mientras el primer transductor hace oscilar la muestra, la respuesta resonante de esta es detectada por el otro transductor. De esta manera, se observa una respuesta ampliada cuando la frecuencia del primer transductor corresponde con la frecuencia de un modo de vibración propio de la muestra, de acuerdo al sistema cristalino de la muestra \cite{Leisure_1997}. Los detalles del montaje experimental se pueden encontrar en la referencia \cite{MIGLIORI19931}
 
-A partir de un problema de valores propios y vectores propios generalizado se pueden predecir las frecuencias obtenidas por la técnica de RUS, teniendo las constantes elásticas, las dimensiones de la muestra y su densidad. El problema a resolver es el siguiente \cite{Leisure_1997}:
+Aplicando el principio de Hamilton al lagrangiano de un sólido cristalino se obtiene problema de valores propios y vectores propios generalizado que permite predecir las frecuencias obtenidas por la técnica de RUS, que se muestra a continuación: \cite{Leisure_1997}:
 
 \begin{equation}
     \rho \omega^2 \bm{E} \vec{a} = \bm{\Gamma} \vec{a} 
 \end{equation}
 
-Los valores propios del problema serán $\rho \omega^2$. Los elementos de las matrices $\bm{\Gamma}$ y $\bm{E}$ se obtienen de la siguiente manera: 
+Los elementos de las matrices $\bm{\Gamma}$ y $\bm{E}$ se obtienen de la siguiente manera \cite{Ohno}: 
 
 \begin{equation}
     \Gamma_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \sum_{j=1}^{3} \sum_{l=1}^{3} {C_{ijkl} \int_{V}{\frac{\partial \phi_{i \lambda_{1} \mu_1 \nu_1}}{\partial r_j} \frac{\partial \phi_{k \lambda_2 \mu_2 \nu_2}}{\partial r_l} dV}}
@@ -62,50 +62,48 @@ Los valores propios del problema serán $\rho \omega^2$. Los elementos de las ma
     E_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \int_{V}{\delta_{ik} \phi_{i \lambda_1 \mu_1 \nu_1}  \phi_{k \lambda_2 \mu_2 \nu_2} dV}
 \end{equation}
 
-Donde $r_1 = x$, $r_2 = y$ y  $r_3 = z$. Las funciones $\phi_{i \lambda \mu \nu}$ son las funciones base en las que se expresan los desplazamientos del sólido al deformarse. Un ejemplo, de lo que pueden ser las funciones base es: 
+Donde $r_1 = x$, $r_2 = y$ y  $r_3 = z$. Las funciones $\phi_{i \lambda \mu \nu}$ son las funciones base en las que se expresan los desplazamientos del sólido al deformarse. Un ejemplo, de lo que pueden ser las funciones base es \cite{Demarest}: 
 
 \begin{equation}
     \phi_{i \lambda \mu \nu} = \left(\frac{x}{L_x} \right)^{\lambda} \left(\frac{y}{L_y} \right)^{\mu} \left(\frac{z}{L_z} \right)^{\nu}
 \end{equation}
 
-Para una geometría de la muestra donde esta es, por ejemplo, un paralelepípedo rectangular y se escogen funciones base con un grado ($N_g$) máximo de 10, se tienen matrices $\bm{\Gamma}$ y $\bm{E}$ de 858x858. Entre mayor sea el grado de las funciones base mayor número de frecuencias se podrá predecir con este problema de valores propios. Sin embargo, el tiempo computacional aumentará cúbicamente con el número de grado de las funciones base. A este problema de valores propios se le llama ``forward problem".
+Para una geometría de la muestra donde esta es, por ejemplo, un paralelepípedo rectangular y se escogen funciones base con un grado ($N_g$) máximo de 10, se tienen matrices $\bm{\Gamma}$ y $\bm{E}$ de 858x858. Entre mayor sea el grado de las funciones base mayor número de frecuencias se podrá predecir con este problema de valores propios. Sin embargo, el tiempo computacional aumentará cúbicamente con el número de grado de las funciones base. A este problema de valores propios se le llama ``forward problem". El problema inverso donde se tienen las frecuencias y se predicen las constantes elásticas se llama el ``inverse problem''
 
-Normalmente las mediciones de RUS obtienen las frecuencias propias de la muestra y a partir de estas frecuencias se busca obtener las constantes elásticas de la muestra. Es decir, se busca hacer el proceso inverso al problema de valores propios mencionado anteriormente. Este problema es llamado el ``inverse problem". En el presente proyecto de tesis se creará un modelo de aprendizaje automático que obtenga las constantes elásticas de una muestra dado su espectro de frecuencias. Para ello se resolverán varios ``forward problem'' con distintos valores de constantes elásticas y geometrías. Luego se tomarán los resultados de los ``forward problem'' para entrenar el modelo que permita resolver el ``inverse problem''.
+En el presente proyecto de tesis se creará un modelo de aprendizaje automático que obtenga las constantes elásticas de una muestra dado su espectro de frecuencias. Para ello se resolverán varios ``forward problem'' con distintos valores de constantes elásticas y geometrías. Luego se tomarán los resultados de los ``forward problem'' para entrenar el modelo que permita resolver el ``inverse problem''.
 %Y listo, le enviamos este resumen a Julián 
 
 \section{Abstract}
-Ultrasonic measurements have been valuable for the study of condensed matter physics and materials science. Elastic constants, which can be obtained with such measures, are of fundamental importance; they are second derivatives of the free energy with respect to strain and are directly related to the atomic bonding of the material. In addition, they are connected to thermal properties of solids through Debye theory. In combination with specific heat and thermal expansion measurements, elastic constant data can be used to determine the equation of state and various thermodynamic functions \cite{Leisure_1997}.
+Ultrasonic measurements have been valuable for the study of condensed matter physics and materials science. Elastic constants, which can be obtained with such measures, are of fundamental importance because they are directly related to the atomic bonding of the material. In addition, they are connected to thermal properties of solids through Debye theory. In combination with specific heat and thermal expansion measurements, elastic constant data can be used to determine the equation of state and various thermodynamic functions \cite{Leisure_1997}.
 
-Elastic constants of a sample can be determined through RUS technique (Resonant Ultrasound Spectroscopy) which consists on placing the sample between two piezoelectric transducers that hold it lightly. Usually the sample has a a parallelepiped or sphere shape. The sample is excited at one point by one of the transducers. The frequency of this driving transducer is swept through a range corresponding to a large number of eigenmodes of the sample. The resonant response of the sample is detected by the opposite transducer. A large response is observed when the frequency of the driving transducer corresponds to one of the sample eigenfrequencies \cite{Leisure_1997}
+Elastic constants of a sample can be determined through RUS technique (Resonant Ultrasound Spectroscopy) which consists on placing the sample between two piezoelectric transducers that hold it lightly. Usually the sample has a regular parallelepiped or sphere shape. The sample is excited at one point by one of the transducers. The frequency of this driving transducer is swept through a range corresponding to a large number of eigenmodes of the sample. The resonant response of the sample is detected by the opposite transducer. A large response is observed when the frequency of the driving transducer corresponds to one of the sample eigenfrequencies \cite{Leisure_1997}. Further details about experimental setup can be found in reference \cite{MIGLIORI19931}.
 
-RUS obtained eigenfrequencies can be derived from a generalized eigenvalues-eigenvector problem, knowing the elastic constants, sample dimensions and it's density. The problem to solve is the following \cite{Leisure_1997}:
-
-\begin{equation}
-    \rho \omega^2 \vec{\vec{E}} \vec{a} = \vec{\vec{\Gamma}} \vec{a} 
-\end{equation}
-
-Problem eigenvalues are $\rho \omega^2$. Matrix elements of $\vec{\vec{\Gamma}}$ and $\vec{\vec{E}}$ are: 
-
-Gamma Matrix: 
+Applying Hammilton principle on the crystalline solid lagrangian, RUS obtained eigenfrequencies can be derived from a generalized eigenvalues-eigenvector problem, knowing the elastic constants, sample dimensions and it's density. The problem to solve is the following \cite{Leisure_1997}:
 
 \begin{equation}
-    \Gamma_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \sum_{j=1}^{3} \sum_{l=1}^{3} {C_{ijkl} \oint_{V}{\frac{\partial \phi_{i \lambda_{1} \mu_1 \nu_1}}{\partial r_j} \frac{\partial \phi_{k \lambda_2 \mu_2 \nu_2}}{\partial r_l} dV}}
+    \rho \omega^2 \bm{E} \vec{a} = \bm{\Gamma} \vec{a} 
 \end{equation}
 
-E matrix:
+Matrix elements of $\bm{\Gamma}$ and $\bm{E}$ are \cite{Ohno}: 
+ 
+
 \begin{equation}
-    E_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \oint_{V}{\delta_{ik} \phi_{i \lambda_1 \mu_1 \nu_1}  \phi_{k \lambda_2 \mu_2 \nu_2} dV}
+    \Gamma_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \sum_{j=1}^{3} \sum_{l=1}^{3} {C_{ijkl} \int_{V}{\frac{\partial \phi_{i \lambda_{1} \mu_1 \nu_1}}{\partial r_j} \frac{\partial \phi_{k \lambda_2 \mu_2 \nu_2}}{\partial r_l} dV}}
 \end{equation}
 
-Where $r_1 = x$, $r_2 = y$ y  $r_3 = z$. Functions $\phi_{i \lambda \mu \nu}$ are the basis functions that describe the displacements of the points in the solid in a deformation. For example, a base function can be: 
+\begin{equation}
+    E_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \int_{V}{\delta_{ik} \phi_{i \lambda_1 \mu_1 \nu_1}  \phi_{k \lambda_2 \mu_2 \nu_2} dV}
+\end{equation}
+
+Where $r_1 = x$, $r_2 = y$ y  $r_3 = z$. Functions $\phi_{i \lambda \mu \nu}$ are the basis functions that describe the displacements of the points in the solid in a deformation. For example, a base function can be \cite{Demarest}: 
 
 \begin{equation}
     \phi_{i \lambda \mu \nu} = \left(\frac{x}{L_x} \right)^{\lambda} \left(\frac{y}{L_y} \right)^{\mu} \left(\frac{z}{L_z} \right)^{\nu}
 \end{equation}
 
-For example, if the sample shape is a parallelepiped, using a ($N_g$) of 10, matrixes $\Gamma$ and $E$ are 858x858. Choosing a greater value of $N_g$ lets the problem to get more eigenfrequencies, but also, computational time will be increased cubicly respect $N_g$. This eigenvalue problem is called the "forward problem".
+For example, if the sample shape is a parallelepiped, using a ($N_g$) of 10, matrixes $\bm{\Gamma}$ and $\bm{E}$ are 858x858. Choosing a greater value of $N_g$ lets the problem to get more eigenfrequencies, but also, computational time will be increased cubicly respect $N_g$. This eigenvalue problem is called the ``forward problem''. Getting the elastic constants using the frequencies is called the ``inverse problem'' 
 
-Usually getting the elastic constants from the frequencies spectrum is the objective of RUS measures, not the other way around. In summary, the inverse process is the objective, called "the inverse problem". In the present project a Machine Learning model will be created to solve this inverse problem. To achieve that multiple runs of the Forward Problem will be performed, using diferent elastic constants and shapes to generate data to train the model.
+In the present project a machine learning model will be created to solve the inverse problem. To achieve that, multiple runs of the forward problem will be performed, using diferent elastic constants and shapes to generate data to train the model.
 %\section{Objetivo General}
 
 %Objetivo general del trabajo. Empieza con un verbo en infinitivo.
