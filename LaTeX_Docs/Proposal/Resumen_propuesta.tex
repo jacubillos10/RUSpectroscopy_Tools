@@ -9,6 +9,7 @@
 \usepackage[left=3cm,top=3cm,right=3cm, bottom=2cm,nohead,nofoot]{geometry}
 \usepackage{braket}
 \usepackage{datenumber}
+\usepackage{amsmath,bm}
 %\newdate{date}{10}{05}{2013}
 %\date{\displaydate{date}}
 
@@ -16,7 +17,7 @@
 
 \begin{center}
 \Huge
-Determinación de constantes elásticas de sólidos a partir de las frecuencias de resonancia obtenidas a partir de Espectroscopía de Resonancia Ultrasónica (RUS)
+Numerical analysis of the elasticity tensor in the mechanical response of solids to resonant ultrasound modulation
 
 \vspace{3mm}
 \Large Jose Alejandro Cubillos Muñoz
@@ -27,7 +28,7 @@ Determinación de constantes elásticas de sólidos a partir de las frecuencias 
 
 \vspace{2mm}
 \Large
-Director: Jose Julián Jimenez Rincón
+Director: Julián Rincón
 
 \normalsize
 \vspace{2mm}
@@ -40,28 +41,25 @@ Director: Jose Julián Jimenez Rincón
 
 \section{Resumen}
 
-Las mediciones ultrasónicas de los materiales han sido valiosas para el estudio de la materia condensada. Estas permiten determinar las constantes elásticas de los materiales, las cuales son de importancia fundamental, ya que son segundas derivadas de la energía libre respecto a la deformación y están directamente relacionadas con los enlaces atómicos del material. Además, están conectadas a propiedades térmicas de los sólidos mediante la la teoría de Debye. Los datos de constantes elásticas, en combinación con mediciones de expansión térmica, también pueden ser usados para determinar la ecuación de estado de varias funciones termodinámicas \cite{Leisure_1997}.
+Las mediciones ultrasónicas de los materiales han sido valiosas para el estudio de la materia condensada. Estas permiten determinar las constantes elásticas de los materiales, las cuales son de importancia fundamental, ya que son segundas derivadas de la energía libre respecto a la deformación y están directamente relacionadas con la estructura atómica del material. Además, están conectadas a propiedades térmicas de los sólidos mediante la teoría de Debye. Los datos de constantes elásticas, en combinación con mediciones de expansión térmica, también pueden ser usados para determinar la ecuación de estado de varias funciones termodinámicas \cite{Leisure_1997}.
 
 
-Mediante la técnica de la Espectroscopía de Resonancia Ultrasónica (RUS por sus siglas en inglés) se puede obtener las mencionadas constantes elásticas. Esta consiste en colocar una muestra del sólido entre dos transductores piezoeléctricos que lo sostienen ligeramente. La muestra del sólido usualmente tiene formas bien definidas como paralelepípedos o esferas. La muestra es excitada en un punto por uno de los transductores. Este transductor hace un barrido de varias frecuencias donde se encuentras varios modos de vibración de la muestra. Mientras el primer transductor hace oscilar la muestra, la respuesta resonante de esta es detectada por el otro transductor. De esta manera, se observa una respuesta amplia cuando la frecuencia del primer transductor corresponde con la frecuencia de un modo de vibración propio de la muestra \cite{Leisure_1997}. 
+Mediante la técnica de la espectroscopía de resonancia ultrasónica (RUS por sus siglas en inglés) se puede obtener las mencionadas constantes elásticas. Esta consiste en colocar una muestra del sólido entre dos transductores piezoeléctricos que lo sostienen ligeramente. La muestra del sólido usualmente tiene formas bien definidas como paralelepípedos regulares o esferas. La muestra es excitada en un punto por uno de los transductores. Este transductor hace un barrido de varias frecuencias donde se encuentran varios modos de vibración de la muestra. Mientras el primer transductor hace oscilar la muestra, la respuesta resonante de esta es detectada por el otro transductor. De esta manera, se observa una respuesta ampliada cuando la frecuencia del primer transductor corresponde con la frecuencia de un modo de vibración propio de la muestra, de acuerdo al sistema cristalino de la muestra \cite{Leisure_1997}. 
 
 A partir de un problema de valores propios y vectores propios generalizado se pueden predecir las frecuencias obtenidas por la técnica de RUS, teniendo las constantes elásticas, las dimensiones de la muestra y su densidad. El problema a resolver es el siguiente \cite{Leisure_1997}:
 
 \begin{equation}
-    \rho \omega^2 \vec{\vec{E}} \vec{a} = \vec{\vec{\Gamma}} \vec{a} 
+    \rho \omega^2 \bm{E} \vec{a} = \bm{\Gamma} \vec{a} 
 \end{equation}
 
-Los valores propios del problema serán $\rho \omega^2$. Los elementos de las matrices $\vec{\vec{\Gamma}}$ y $\vec{\vec{E}}$ se obtienen de la siguiente manera: 
-
-Matriz Gamma: 
+Los valores propios del problema serán $\rho \omega^2$. Los elementos de las matrices $\bm{\Gamma}$ y $\bm{E}$ se obtienen de la siguiente manera: 
 
 \begin{equation}
-    \Gamma_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \sum_{j=1}^{3} \sum_{l=1}^{3} {C_{ijkl} \oint_{V}{\frac{\partial \phi_{i \lambda_{1} \mu_1 \nu_1}}{\partial r_j} \frac{\partial \phi_{k \lambda_2 \mu_2 \nu_2}}{\partial r_l} dV}}
+    \Gamma_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \sum_{j=1}^{3} \sum_{l=1}^{3} {C_{ijkl} \int_{V}{\frac{\partial \phi_{i \lambda_{1} \mu_1 \nu_1}}{\partial r_j} \frac{\partial \phi_{k \lambda_2 \mu_2 \nu_2}}{\partial r_l} dV}}
 \end{equation}
 
-Matriz E:
 \begin{equation}
-    E_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \oint_{V}{\delta_{ik} \phi_{i \lambda_1 \mu_1 \nu_1}  \phi_{k \lambda_2 \mu_2 \nu_2} dV}
+    E_{i, \lambda_1, \mu_1,  \nu1; k, \lambda_2, \mu_2, \nu_2} = \int_{V}{\delta_{ik} \phi_{i \lambda_1 \mu_1 \nu_1}  \phi_{k \lambda_2 \mu_2 \nu_2} dV}
 \end{equation}
 
 Donde $r_1 = x$, $r_2 = y$ y  $r_3 = z$. Las funciones $\phi_{i \lambda \mu \nu}$ son las funciones base en las que se expresan los desplazamientos del sólido al deformarse. Un ejemplo, de lo que pueden ser las funciones base es: 
@@ -70,9 +68,9 @@ Donde $r_1 = x$, $r_2 = y$ y  $r_3 = z$. Las funciones $\phi_{i \lambda \mu \nu}
     \phi_{i \lambda \mu \nu} = \left(\frac{x}{L_x} \right)^{\lambda} \left(\frac{y}{L_y} \right)^{\mu} \left(\frac{z}{L_z} \right)^{\nu}
 \end{equation}
 
-Para una geometría de la muestra donde esta es, por ejemplo, un paralelepípedo y se escogen funciones base con un grado ($N_g$) máximo de 10, se tienen matrices $\Gamma$ y $E$ de 858x858. Entre mayor sea el grado de las funciones base mayor número de frecuencias se podrá predecir con este problema de valores propios, pero a su vez, el tiempo computacional aumentará cúbicamente con el número de grado de las funciones base. A este problema de valores propios se le llama "forward problem".
+Para una geometría de la muestra donde esta es, por ejemplo, un paralelepípedo rectangular y se escogen funciones base con un grado ($N_g$) máximo de 10, se tienen matrices $\bm{\Gamma}$ y $\bm{E}$ de 858x858. Entre mayor sea el grado de las funciones base mayor número de frecuencias se podrá predecir con este problema de valores propios. Sin embargo, el tiempo computacional aumentará cúbicamente con el número de grado de las funciones base. A este problema de valores propios se le llama ``forward problem".
 
-Normalmente las mediciones de RUS obtienen las frecuencias propias de la muestra y a partir de estas frecuencias se busca obtener las constantes elásticas de la muestra. Es decir, se busca hacer el proceso inverso al problema de valores propios mencionado anteriormente. Problema al que suele ser llamado el "inverse problem". En el presente proyecto de tesis se creará un modelo de Machine Learning que obtenga las constantes elásticas de una muestra dado su espectro de frecuencias. Para ello se resolverán varios "forward problem" con distintos valores de constantes elásticas y geometrías. Luego se tomarán los resultados de los "forward problem" para entrenar el modelo que permita resolver el "inverse problem".
+Normalmente las mediciones de RUS obtienen las frecuencias propias de la muestra y a partir de estas frecuencias se busca obtener las constantes elásticas de la muestra. Es decir, se busca hacer el proceso inverso al problema de valores propios mencionado anteriormente. Este problema es llamado el ``inverse problem". En el presente proyecto de tesis se creará un modelo de aprendizaje automático que obtenga las constantes elásticas de una muestra dado su espectro de frecuencias. Para ello se resolverán varios ``forward problem'' con distintos valores de constantes elásticas y geometrías. Luego se tomarán los resultados de los ``forward problem'' para entrenar el modelo que permita resolver el ``inverse problem''.
 %Y listo, le enviamos este resumen a Julián 
 
 \section{Abstract}
