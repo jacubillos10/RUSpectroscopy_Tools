@@ -16,7 +16,8 @@
 
 \begin{center}
 \Huge
-Determinación de constantes elásticas de sólidos a partir de las frecuencias de resonancia obtenidas a partir de Espectroscopía de Resonancia Ultrasónica
+Numerical study of the elasticity tensor in the mechanical response of solids to resonant ultrasound modulation
+%Estudio numérico del tensor de elasticidad en la respuesta de los sólidos a la ¿modulación? ultrasónica resonante
 
 \vspace{3mm}
 \Large Jose Alejandro Cubillos Muñoz
@@ -38,10 +39,81 @@ Director: Julián Rincón
 
 \normalsize
 \section{Introducción}
-Hola \cite{Leisure_1997}
-%Introducci�n a la propuesta de Monograf�a. Debe incluir un breve resumen del estado del arte del problema a tratar. Tambi�n deben aparecer citadas todas las referencias de la bibliograf�a (a menos de que se citen m�s adelante, en los objetivos o metodolog�a, por ejemplo)
 
-Aquí texto
+Las mediciones ultrasónicas han sido valiosas para el estudio de la materia condensada. Estas permiten determinar las constantes elásticas de los materiales, las cuales son de importancia fundamental, ya que están directamente relacionadas con su estructura atómica. Además, están conectadas a propiedades térmicas de los sólidos mediante la teoría de Debye. Las constantes elásticas, en combinación con mediciones de expansión térmica, también pueden ser usadas para determinar la ecuación de estado de varias funciones termodinámicas \cite{Leisure_1997}.
+
+\subsection {Espectroscopía de resonancia ultrasónica}
+
+Mediante la técnica de la espectroscopía de resonancia ultrasónica (RUS por sus siglas en inglés) se puede obtener las mencionadas constantes elásticas. Esta consiste en colocar una muestra del sólido entre dos transductores piezoeléctricos que lo sostienen ligeramente \cite{MIGLIORI19931}. La muestra usualmente tiene formas bien definidas como paralelepípedos rectangulares o esferas y es excitada en un punto por uno de los transductores. Este transductor hace un barrido de frecuencias donde se encuentran varios modos de vibración de la muestra. Mientras el primer transductor hace oscilar la muestra, la respuesta resonante de esta es detectada por el otro transductor. De esta manera, se observa una respuesta amplificada cuando la frecuencia del primer transductor corresponde con la frecuencia de un modo de vibración propio de la muestra, de acuerdo al sistema cristalino de la muestra \cite{Leisure_1997}. La figura \ref{fig:montaje_rus} muestra cómo se coloca una muestra paralelepípeda entre los transductores.
+
+\begin{figure}%[h]
+    \centering
+    \includegraphics[scale=0.5]{Img/Montaje_RUS.png}
+    \caption{Montaje experimental para el procedimiento de RUS \cite{Leisure_1997}}
+    \label{fig:montaje_rus}
+\end{figure}
+
+Se puede observar que la muestra solo se sostiene de las puntas. Esto permite que hayan condiciones de frontera libres en la muestra. Mas detalles del montaje experimental se pueden encontrar en la referencia \cite{MIGLIORI19931}.
+
+\subsection{Los tensores de deformación, esfuerzo y elasticidad}
+
+La respuesta del material a distintos esfuerzos aplicados sobre este es gobernada por la ley generalizada de Hooke. Antes de plantear la ley generalizada de Hooke se definirá el tensor deformación, $\bm{\varepsilon}$ ,el cual se relaciona con los desplazamientos de cada punto del sólido de la siguiente manera:
+
+% ****************************************************
+% Coloque aquí la ecuación del tensor de deformación
+% *******************************************************
+
+Donde $\vec{u}_{(x,y,z)}$ es el desplazamiento de un punto respecto a su punto de equilibrio. 
+
+Por otro, se define el tensor de esfuerzos, $\bm{\sigma}$, que representa la fuerza por unidad de área que se aplica a un elemento cúbico infinitesimal de la muestra en cada una de las caras, tal como se muestra en la figura [PENDIENTE FIGURA] 
+
+% *****************************************************
+% Colocar aquí una figura que represente al tensor de esfuerzos con su respectiva cita
+%*******************************************************
+Estos dos tensores se relacionan entre sí mediante la ley de Hooke generalizada, que se muestra a continuación:
+
+Donde $C_{ijkl}$ es una componente del tensor de elasticidad o de constantes elásticas del material $\bm{C}$, el cual se busca obtener en el presente proyecto a partir de las frecuencias de resonancias dadas. 
+%*******************************************************
+%Colocar la ley de hooke generalizada sin las sumatorias incluídas, y citar al leisure
+%********************************************************
+
+Se puede observar que el tensor de deformación es simétrico, es decir, $\varepsilon_{kl} = \varepsilon_{lk}$. Por un lado se tiene que $\sigma_{ij} = C_{ijkl}\varepsilon_{kl}$ y por otro lado se tiene que $\sigma_{ij} = C_{ijlk}\varepsilon_{lk}$. Al igualar las anteriores expresiones se tiene que:
+% *****************************************************
+%Igualar C_{ijkl} y C_{ijlk}.
+% *****************************************************
+
+Por otro lado, en ausencia de torques se tiene que $\sigma_{ij} = \sigma_{ji}$, es decir, $C_{ijkl}\varepsilon_{kl} = C_{jikl}\varepsilon_{kl}$, lo cual implica que: 
+%********************************************************
+%Igualar C_{ijkl} y C_{jikl}
+%*********************************************************
+Las relaciones de simetría encontradas permiten intercambiar los primeros dos índices y los dos últimos indices del tensor de constantes elásticas. Esto reduce la cantidad constantes independientes de 81 a 36. Cada par de índices se puede organizar de 6 formas, es decir, se puede reescribir el tensor de constantes elásticas $\bm{C}$ como una matriz 6$\times$6, cambiando cada par de índices por uno nuevo de acuerdo al cuadro \ref{tab:my-table}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lll}
+	índice i & índice j & índice nuevo m \\
+	1 & 1 & 1            \\
+	2 & 2 & 2            \\
+	3 & 3 & 3            \\
+	2 & 3 & 1            \\
+	1 & 3 & 2            \\
+	1 & 2 & 3           
+	\end{tabular}
+	\caption{Transformación de pares de índices del tensor de elasticidad y del tensor de deformación}
+	\label{tab:my-table}
+\end{table}
+
+Este cambio de índices también permite escribir los tensores de deformación como vectores. Con estos nuevos índices se puede escribir la energía potencial elástica de la siguiente manera: 
+
+%**************************************************+
+%Escribir energía potencial elástica con sumas
+% ****************************************************
+
+A partir de aquí se puede ver que los índices n y m se pueden intercambiar, lo cual implica que $C_{mn} = C_{nm}$. Regresando a la notación con los 4 índices se tiene que $C_{ijkl} = C_{klij}$. Con esto se tiene un tensor $\bm{C}$ con 21 constantes independientes en el caso mas general. 
+
+
+\subsection{Planteamiento del problema de valores propios}
+
 
 \section{Objetivo General}
 
@@ -105,9 +177,5 @@ Aqu\'i texto.
 
 \section*{Firma del Director}
 \vspace{1.5cm}
-
-\section*{Firma del Codirector	}
-
-
 
 \end{document} 
