@@ -10,6 +10,7 @@
 \usepackage{braket}
 \usepackage{datenumber}
 \usepackage{amsmath,bm}
+\usepackage{float}
 %\newdate{date}{10}{05}{2013}
 %\date{\displaydate{date}}
 \begin{document}
@@ -46,7 +47,7 @@ Las mediciones ultrasónicas han sido valiosas para el estudio de la materia con
 
 Mediante la técnica de la espectroscopía de resonancia ultrasónica (RUS por sus siglas en inglés) se puede obtener las mencionadas constantes elásticas. Esta consiste en colocar una muestra del sólido entre dos transductores piezoeléctricos que lo sostienen ligeramente \cite{MIGLIORI19931}. La muestra usualmente tiene formas bien definidas como paralelepípedos rectangulares o esferas y es excitada en un punto por uno de los transductores. Este transductor hace un barrido de frecuencias donde se encuentran varios modos de vibración de la muestra. Mientras el primer transductor hace oscilar la muestra, la respuesta resonante de esta es detectada por el otro transductor. De esta manera, se observa una respuesta amplificada cuando la frecuencia del primer transductor corresponde con la frecuencia de un modo de vibración propio de la muestra, de acuerdo al sistema cristalino de la muestra \cite{Leisure_1997}. La figura \ref{fig:montaje_rus} muestra cómo se coloca una muestra paralelepípeda entre los transductores.
 
-\begin{figure}%[h]
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{Img/Montaje_RUS.png}
     \caption{Montaje experimental para el procedimiento de RUS \cite{Leisure_1997}}
@@ -59,36 +60,41 @@ Se puede observar que la muestra solo se sostiene de las puntas. Esto permite qu
 
 La respuesta del material a distintos esfuerzos aplicados sobre este es gobernada por la ley generalizada de Hooke. Antes de plantear la ley generalizada de Hooke se definirá el tensor deformación, $\bm{\varepsilon}$ ,el cual se relaciona con los desplazamientos de cada punto del sólido de la siguiente manera:
 
-% ****************************************************
-% Coloque aquí la ecuación del tensor de deformación
-% *******************************************************
+\begin{equation}
+    \varepsilon_{ik} = \frac{1}{2} \left(\frac{\partial u_i}{\partial r_k} + \frac{\partial u_k}{\partial r_i} \right)
+	\label{eq:deformación}
+\end{equation}
 
-Donde $\vec{u}_{(x,y,z)}$ es el desplazamiento de un punto respecto a su punto de equilibrio. 
+El desplazamiento de un punto respecto a su punto de equilibrio es $\vec{u}_{(x,y,z)}$. Las componentes de cada vector son: $u_1 = u_x$, $u_2 = u_y$, $u_3 = u_z$, $r_1 = x$, $r_2 = y$ y $r_3 = z$.
 
-Por otro, se define el tensor de esfuerzos, $\bm{\sigma}$, que representa la fuerza por unidad de área que se aplica a un elemento cúbico infinitesimal de la muestra en cada una de las caras, tal como se muestra en la figura [PENDIENTE FIGURA] 
+Por otro, se define el tensor de esfuerzos, $\bm{\sigma}$, que representa la fuerza por unidad de área que se aplica a un elemento cúbico infinitesimal de la muestra en cada una de las caras, tal como se muestra en la figura \ref{fig:tensor_esfuerzos} \cite{oliveira2020}.
 
-% *****************************************************
-% Colocar aquí una figura que represente al tensor de esfuerzos con su respectiva cita
-%*******************************************************
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{Img/Stress_tensor.png}
+    \caption{Representación del tensor de esfuerzos en un elemento cúbico infinitesimal de la muestra \cite{oliveira2020}}
+    \label{fig:tensor_esfuerzos}
+\end{figure}
+
 Estos dos tensores se relacionan entre sí mediante la ley de Hooke generalizada, que se muestra a continuación:
+\begin{equation}
+	\sigma_{ij} = C_{ijkl}\varepsilon_{kl},
+\end{equation}
+donde $C_{ijkl}$ es una componente del tensor de elasticidad o de constantes elásticas del material $\bm{C}$, el cual se busca obtener en el presente proyecto a partir de las frecuencias de resonancias dadas. 
 
-Donde $C_{ijkl}$ es una componente del tensor de elasticidad o de constantes elásticas del material $\bm{C}$, el cual se busca obtener en el presente proyecto a partir de las frecuencias de resonancias dadas. 
-%*******************************************************
-%Colocar la ley de hooke generalizada sin las sumatorias incluídas, y citar al leisure
-%********************************************************
 
 Se puede observar que el tensor de deformación es simétrico, es decir, $\varepsilon_{kl} = \varepsilon_{lk}$. Por un lado se tiene que $\sigma_{ij} = C_{ijkl}\varepsilon_{kl}$ y por otro lado se tiene que $\sigma_{ij} = C_{ijlk}\varepsilon_{lk}$. Al igualar las anteriores expresiones se tiene que:
-% *****************************************************
-%Igualar C_{ijkl} y C_{ijlk}.
-% *****************************************************
+\begin{equation}
+	C_{ijkl} = C_{ijlk}.
+\end{equation}
 
 Por otro lado, en ausencia de torques se tiene que $\sigma_{ij} = \sigma_{ji}$, es decir, $C_{ijkl}\varepsilon_{kl} = C_{jikl}\varepsilon_{kl}$, lo cual implica que: 
-%********************************************************
-%Igualar C_{ijkl} y C_{jikl}
-%*********************************************************
+\begin{equation}
+	C_{ijkl} = C_{jikl}.
+\end{equation}
 Las relaciones de simetría encontradas permiten intercambiar los primeros dos índices y los dos últimos indices del tensor de constantes elásticas. Esto reduce la cantidad constantes independientes de 81 a 36. Cada par de índices se puede organizar de 6 formas, es decir, se puede reescribir el tensor de constantes elásticas $\bm{C}$ como una matriz 6$\times$6, cambiando cada par de índices por uno nuevo de acuerdo al cuadro \ref{tab:my-table}.
 
-\begin{table}[h]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{lll}
 	índice i & índice j & índice nuevo m \\
@@ -103,17 +109,54 @@ Las relaciones de simetría encontradas permiten intercambiar los primeros dos �
 	\label{tab:my-table}
 \end{table}
 
-Este cambio de índices también permite escribir los tensores de deformación como vectores. Con estos nuevos índices se puede escribir la energía potencial elástica de la siguiente manera: 
+Este cambio de índices también permite escribir los tensores de deformación como vectores. Con estos nuevos índices se puede escribir la energía potencial elástica, por unidad de volumen, de la siguiente manera: 
 
-%**************************************************+
-%Escribir energía potencial elástica con sumas
-% ****************************************************
+\begin{equation}
+	\mathcal{U} = \frac{1}{2} \sum_{m=1}^{3}{\sum_{n=1}^{3}{C_{mn}\varepsilon_{m}\varepsilon_{n}}}
+	\label{eq:u_vol}
+\end{equation}
 
 A partir de aquí se puede ver que los índices n y m se pueden intercambiar, lo cual implica que $C_{mn} = C_{nm}$. Regresando a la notación con los 4 índices se tiene que $C_{ijkl} = C_{klij}$. Con esto se tiene un tensor $\bm{C}$ con 21 constantes independientes en el caso mas general. 
 
 
 \subsection{Planteamiento del problema de valores propios}
 
+Para determinar las frecuencias de resonancia de una muestra se planteará un lagrangiano que luego será extremizado. Por un lado la energía total de la muestra viene siendo:
+
+\begin{equation}
+	K = \frac{1}{2} \int_{V}{\rho \dot{u}^2} dV
+\end{equation}
+
+La velocidad de desplazamiento de los puntos de la muestra va a estar dada por $\dot{u} = \omega{u}$ y dado que $u^2 = \sum_{i=1}^{3}{u_i^2} = \sum_{i=1}^{3}{\sum_{k=1}^{3}{\delta_{ik}u_i u_k}}$, la energía cinética queda:
+
+\begin{equation}
+	K = \frac{1}{2} \int_{V}{\rho \omega^2 \left(\sum_{i=1}^{3}{\sum_{k=1}^{3}{\delta_{il} u_i u_k}} \right) dV}
+\end{equation}
+
+Por otro lado, la energía potencial viene dada por la expresión \ref{eq:u_vol}. Esta se va a reescribir con la notación de 4 índices y se integrará sobre todo el volumen para obtener la energía potencial total: 
+
+%**********************************************************************************
+%EXpresión para la energía cinpetica bien chingona
+%******************************************************************************
+\begin{equation}
+	U = \frac{1}{2} \int_{V}{\sum_{i=1}^{3}\sum_{j=1}^{3}\sum_{k=1}^{3}\sum_{l=1}^{3}{C_{ijkl}\varepsilon_{ij}\varepsilon_{kl}}dV}
+	\label{eq:U_raw}
+\end{equation}
+
+Usando la expresión \ref{eq:deformación} en el producto $\varepsilon_{ij}\varepsilon_{kl}$ se tiene que
+
+\begin{equation}
+	\varepsilon_{ij}\varepsilon_{kl} = \frac{1}{4} \left(\frac{\partial u_j}{\partial r_i} \frac{\partial u_k}{\partial r_l} + \frac{\partial u_j}{\partial r_i} \frac{\partial u_l}{\partial r_k}+\frac{\partial u_i}{\partial r_j} \frac{\partial u_k}{\partial r_l}+\frac{\partial u_i}{\partial r_j} \frac{\partial u_l}{\partial r_k} \right).
+\end{equation}
+Reemplazando el producto $\varepsilon_{ij}\varepsilon_{kl}$ en \ref{eq:U_raw}, separando la ecuación en 4 sumas e intercambiando índices se obtiene la siguiente expresión para la energía potencial:
+\begin{equation}
+	U = \frac{1}{2} \int_{V}{\sum_{i=1}^{3}\sum_{j=1}^{3}\sum_{k=1}^{3}\sum_{l=1}^{3}{C_{ijkl}\frac{\partial u_i}{\partial r_j} \frac{\partial u_k}{\partial r_l}}dV}.
+	\label{eq:U_cooked}
+\end{equation}
+Finalmente el lagrangiano en términos de los desplazamientos queda así: 
+\begin{equation}
+	a = a
+\end{equation}
 
 \section{Objetivo General}
 
