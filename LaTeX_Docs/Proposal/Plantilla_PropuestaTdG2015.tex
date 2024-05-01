@@ -183,7 +183,7 @@ Reemplazando la expresión \ref{eq:funciones_base_general} en las ecuaciones \re
 \end{equation}
 \begin{equation}
 	\centering
-	U = \frac{1}{2} \sum_{i=1}^{3}\sum_{k=1}^{3}\sum_{\Scale[0.5]{\lambda_1,\mu_1,\nu_1 = 0}}^{\Scale[0.5]{\lambda_1 + \mu_1 + \nu_1 \le N_g}} \sum_{\Scale[0.5]{\lambda_2,\mu_2,\nu_2 = 0}}^{\Scale[0.5]{\lambda_2 + \mu_2 + \nu_2 \le N_g}} {a_{i \lambda_1 \mu_1 \nu_1}\left(\sum_{j=1}^{3}\sum_{l=1}^{3} C_{ijkl}\int_{V} { \frac{\partial \phi_{i \lambda_1 \mu_1 \nu_1}}{\partial r_j} \frac{\partial \phi_{k \lambda_1 \mu_1 \nu_1}}{\partial r_l} dV} \right) a_{k \lambda_2 \mu_2 \nu_2}}.
+	U = \frac{1}{2} \sum_{i=1}^{3}\sum_{k=1}^{3}\sum_{\Scale[0.5]{\lambda_1,\mu_1,\nu_1 = 0}}^{\Scale[0.5]{\lambda_1 + \mu_1 + \nu_1 \le N_g}} \sum_{\Scale[0.5]{\lambda_2,\mu_2,\nu_2 = 0}}^{\Scale[0.5]{\lambda_2 + \mu_2 + \nu_2 \le N_g}} {a_{i \lambda_1 \mu_1 \nu_1}\left(\sum_{j=1}^{3}\sum_{l=1}^{3} C_{ijkl}\int_{V} { \frac{\partial \phi_{i \lambda_1 \mu_1 \nu_1}}{\partial r_j} \frac{\partial \phi_{k \lambda_2 \mu_2 \nu_2}}{\partial r_l} dV} \right) a_{k \lambda_2 \mu_2 \nu_2}}.
 	\label{eq:U_final}
 \end{equation}
 
@@ -210,7 +210,7 @@ donde los elementos matriciales de $\bm{E}$ y $\bm{\Gamma}$ son los siguientes:
 	\label{eq:matriz_gamma}
 \end{equation}
 
-Por ejemplo, usando las funciones base de la ecuación \ref{eq:funciones_base_potencias} y con una muestra de forma paralelepípeda con dimensiones $L_x$, $L_y$ y $L_z$, se tiene que los elementos de las matrices $\bm{E}$ y $\bm{\Gamma}$, con los valores de $x$, $y$ y $z$ adimensionalizados, son:
+Por ejemplo, usando las funciones base de la ecuación \ref{eq:funciones_base_potencias} y con una muestra de forma paralelepípeda con dimensiones $L_x$, $L_y$ y $L_z$, se tiene que los elementos de las matrices $\bm{E}$ y $\bm{\Gamma}$, con los valores de $x$, $y$ y $z$ adimensionalizados, son \cite{Ohno}:
 \begin{equation}
 	E_{i \lambda_1 \mu_1 \nu_1; k \lambda_2 \mu_2 \nu_2} = \int_{-1}^{1} \int_{-1}^{1} \int_{-1}^{1} {\delta_{ik} x^{\lambda_1 + \lambda_2} y^{\mu_1 + \mu_2} z^{\nu_1 + \nu_2} dx dy dz}
 	\label{eq:matriz_E_paralelepípedo_pot}
@@ -247,10 +247,9 @@ Construir modelos de aprendizaje automático consistentes que permitan determina
 %Objetivos espec�ficos del trabajo. Empiezan con un verbo en infinitivo.
 
 \begin{itemize}
-	\item Objetivo 1
-	\item Objetivo 2
-	\item Objetivo 3
-	\item ...
+	\item Crear un código que permita hallar las frecuencias propias de una muestra sólida dada las constantes elásticas, dimensiones y densidad.
+	\item Generar grandes conjuntos de datos usando el código del forward problem que servirán de entrenamiento al modelo
+	\item Probar distintos modelos y entrenarlos con los datos generados.
 \end{itemize}
 
 \section{Metodología}
@@ -259,32 +258,39 @@ Construir modelos de aprendizaje automático consistentes que permitan determina
 
 %Monograf�a te�rica o computacional: �C�mo se har�n los c�lculos te�ricos? �C�mo se har�n las simulaciones? �Qu� requerimientos computacionales se necesitan? �Qu� espacios f�sicos o virtuales se van a utilizar?
 
-%Monograf�a experimental: Recordar que para ser aprobada, los aparatos e insumos experimentales que se usar�n en la Monograf�a deben estar previamente disponibles en la Universidad, o garantizar su disponibilidad para el tiempo en el que se realizar� la misma. �Qu� montajes experimentales se van a usar y que material se requiere? �En qu� espacio f�sico se llevar�n a cabo los experimentos? Si se usan aparatos externos, �qu� permisos se necesitan? Si hay que realizar pagos a terceros, �c�mo se financiar� esto?
-
-Para lograr los objetivos planteados se creará un código que resuelva el "forward problem", es decir, 
-
+Para lograr los objetivos planteados se creará un código que resuelva el problema de valores propios para halla las frecuencias dadas las constantes elásticas. Con este código se busca generar los datos para entrenar el modelo de aprendizaje automático que resolverá el problema inverso. El código construido  no solo generará datos de muestras paralelepípedas sino también muestras cilíndricas y muestras esféricas. Luego se harán mejoras a este código que permitan generar datos más rápido. Una de estas mejoras consiste en reorganizar el vector $\vec{a}$ con las matrices $\bm{E}$ y $\bm{\Gamma}$, de acuerdo a simetrías de reflexión, doble rotación e inversión, para que estas últimas sean diagonales en bloques. Al hacer las matrices diagonales en bloques se reduce drásticamente el tiempo computacional, lo que permite generar datos de manera mucho más rápida \cite{Leisure_1997}. 
+\\
+Una hecho el código que resuelve el problema de valores propios se procederá a generar grandes volúmenes de datos cambiando los parámetros de la forma de la muestra, densidad y constantes elásticas. Para la generación de estos datos se usara el cluster HPC de la Universidad. Una vez se ponen a trabajar las máquinas para la generación de datos, se trabajará paralelamente en investigar el funcionamiento de distintos algoritmos de aprendizaje automático y distintos algoritmos de boosting que sean candidatos para la resolución del problema inverso. Algunos algoritmos a los que se investigará su funcionamiento serán: Random Forest, Redes Neuronales y Rotation Forest. Algunos algoritmos de boosting que se investigarán para mejorar el desempeño de los anteriores algoritmos serán adaboost y xgboost. Mientras se hace esta tarea también se investigarán nuevos algoritmos que se vayan conociendo en el camino. 
+\\
+Una vez se hayan generado los datos se procederá a dividirlos en bloques de entrenamiento, validación y evaluación. Se entrenarán distintos modelos con los dichos datos de entrenamiento y se observará su desempeño con los datos de evaluación. Se escogerá el modelo con el mejor desempeño. También se considerará usar otras técnicas como el k-fold-cross-validation para evitar el "overfitting" en donde de dividen los datos en varios bloques, se entrena con los primeros $k-1$ bloques y se evalúa con el último bloque, luego se escoge otro bloque de evaluación y se entrena de nuevo el modelo con los bloques restantes y se vuelve evaluar, repitiendo el proceso k veces.  
 \section{Cronograma}
 
-\begin{table}[htb]
+\begin{table}[H]
 	\begin{tabular}{|c|cccccccccccccccc| }
 	\hline
 	Tareas $\backslash$ Semanas & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16  \\
 	\hline
-	1 & X & X &   &   &   &   &   & X & X &   &   &   &   &   &   &   \\
-	2 &   & X & X &   & X & X & X &   &   & X & X & X &   & X & X &   \\
-	3 &   &   &   & X &   &   &   & X &   &   &   & X &   &   & X &   \\
-	4 & X & X & X & X & X & X & X & X & X & X &   &   &   &   &   &   \\
-	5 &   &   &   &   & X &   &   &   & X &   &   & X &   &   & X &   \\
+	1 & X & X & X & X & X & X & X & X & X & X & X & X & X & X & X & X \\
+	2 & X & X & X &   &   &   &   &   &   &   &   &   &   &   &   &   \\
+	3 &   &   &   & X & X & X & X & X & X & X & X & X & X &   &   &   \\
+	4 &   &   &   & X & X & X & X & X & X & X & X & X & X & X & X & X \\
+	5 & X & X &   &   &   &   &   &   &   &   &   &   &   &   &   &   \\
+	6 &   &   &   &   &   &   &   &   &   &   &   &   &   & X & X & X \\
 	\hline
 	\end{tabular}
 \end{table}
 \vspace{1mm}
 
 \begin{itemize}
-	\item Tarea 1:
-	\item Tarea 2: 
-	\item Tarea 3:
+	\item Tarea 1: Escritura del documento de tesis.
+	\item Tarea 2: Creación del código que resuelve el problema de valores propios "forward problem"
+	\item Tarea 3: Generación de datos de frecuencias para entrenar los modelos de aprendizaje automático
+	\item Tarea 4: Investigación del funcionamiento de distintos algoritmos de aprendizaje automático y de distintos algoritmos de boosting
+	\item Tarea 5: Realización del curso de cluster HPC en Bloque Neón
+	\item Tarea 6: Entrenamiento de los algoritmos de aprendizaje automático encontrados
 \end{itemize}
+
+El segundo semestre de tesis se continuará con las tareas 1, 6 y otras que hayan quedado incompletas en el tercer semestre por imprevistos. 
 
 \section{Personas Conocedoras del Tema}
 
