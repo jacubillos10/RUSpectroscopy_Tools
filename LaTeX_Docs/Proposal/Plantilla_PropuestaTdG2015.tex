@@ -239,6 +239,14 @@ Mediante la resolución de este problema de valores propios se hallan las frecue
 
 \subsection{Estado del arte}
 
+El trabajo mas reciente encontrado en donde se usa aprendizaje automático para resolver el problema inverso de valores propios usa redes neuronales (Deep Learning) para hallar las constantes elásticas. En este trabajo se hace un preprocesamiento del espectro de frecuencias y se transforma en un ``modulated fingerprint''. Este ``modulated fingerprint'' se divide el espectro de frecuencias en "bins" que terminan transformados en una imagen. Esta imagen es la que se usa para entrenar la red neuronal \cite{Liu2023}. Se considerará estudiar este método de preprocesamiento de datos para este proyecto, ya que, puede facilitar la fase de entrenamiento de los datos.
+\\
+Existe otro trabajo donde se hace también un preprocesamiento de los datos, donde se transforma el espectro de frecuencias en una imagen, de tres capas, antes de entrenar a las redes neuronales. En este trabajo en específico se usan dos redes neuronales. Una red saca la información de las constantes en un ``Blackman Diagram'' y la otra red neuronal es una red de regresión \cite{Fukuda2023}. 
+\\
+Por otro lado también se han usado Redes Neuronales de manera directa para hallar las constantes elásticas de $LiNbO_3$ a la vez que se hallan las constantes de esfuerzo de los piezoeléctricos \cite{Yang2022}. También se ha usado redes neuronales para mapear espectros de frecuencias a dos distintas fases del material de $URu_{2}Si_{2} \cite{Ghosh2020}$. 
+\\
+Se puede observar que se han hecho trabajos donde se resuelve el problema inverso usando redes neuronales. No se encontraron usos distintos a las redes neuronales para resolver el problema inverso de la espectroscopía de resonancia ultrasónica. Esto da la oportunidad al presente proyecto a probar algoritmos distintos a las redes neuronales, aunque estas se tendran en cuenta en el proyecto. 
+
 \section{Objetivo General}
 
 Construir modelos de aprendizaje automático consistentes que permitan determinar el tensor de elasticidad de un material, basado en su espectro de resonancia ultrasónica y características geométricas como forma, dimensiones y densidad.
