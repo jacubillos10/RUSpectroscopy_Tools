@@ -20,7 +20,7 @@
 %\fancyhf{} % Clear header and footer
 %\fancyfoot[R]{\thepage} % Page number in the bottom left corner
 %\renewcommand{\headrulewidth}{0pt} % Remove horizontal line from header
-
+%\renewcommand*{\baselinestretch}{4}
 \newcommand*{\Scale}[2][4]{\scalebox{#1}{$#2$}}%
 %\newdate{date}{10}{05}{2013}
 %\date{\displaydate{date}}
@@ -60,7 +60,7 @@ Mediante la técnica de la espectroscopía de resonancia ultrasónica (RUS por s
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.5]{Img/Montaje_RUS.png}
+    \includegraphics[scale=0.6]{Img/Montaje_RUS.png}
     \caption{Esquema del montaje experimental para el procedimiento de RUS \cite{Leisure_1997}.}
     \label{fig:montaje_rus}
 \end{figure}
@@ -104,18 +104,24 @@ Por otra parte, en ausencia de torques se tiene que $\sigma_{ij} = \sigma_{ji}$,
 	C_{ijkl} = C_{jikl}.
 \end{equation}
 
-Las relaciones de simetría encontradas permiten intercambiar los primeros dos índices y los dos últimos indices del tensor de constantes elásticas. Esto reduce la cantidad constantes independientes de 81 a 36. Cada par de índices se puede organizar de 6 formas, es decir, se puede reescribir el tensor de constantes elásticas $\bm{C}$ como una matriz 6$\times$6, cambiando cada par de índices por uno nuevo de acuerdo al cuadro \ref{tab:my-table} [PENDIENTE!!].
+
+Las relaciones de simetría encontradas permiten intercambiar los primeros dos índices y los dos últimos indices del tensor de constantes elásticas. Esto reduce la cantidad constantes independientes de 81 a 36. Cada par de índices se puede organizar de 6 formas, es decir, se puede reescribir el tensor de constantes elásticas $\bm{C}$ como una matriz 6$\times$6, cambiando cada par de índices por uno nuevo de acuerdo al cuadro \ref{tab:my-table}. Lo mismo se puede hacer con el tensor de deformación, el cual se puede reescribir como un vector de 6 componentes. Esta forma de representar un tensor simétrico como un vector o bien otro tensor de orden reducido se llama la notación de Voigt \cite{JAMAL2014592}.
+
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{lll}
+	%\begin{tabular}{|c|cccccccccccccccc| }
+	\begin{tabular}{|c|c|c|}
+	\hline
 	índice \textit{i} & índice \textit{j} & índice nuevo \textit{m} \\
+	\hline
 	1 & 1 & 1            \\
 	2 & 2 & 2            \\
 	3 & 3 & 3            \\
 	2 & 3 & 1            \\
 	1 & 3 & 2            \\
-	1 & 2 & 3           
+	1 & 2 & 3    		 \\	
+	\hline       
 	\end{tabular}
 	\caption{Transformación de pares de índices del tensor de elasticidad y del tensor de deformación}
 	\label{tab:my-table}
@@ -240,13 +246,18 @@ Mediante la resolución de este problema de valores propios se hallan las frecue
 
 \subsection{Estado del arte}
 
-El trabajo más reciente encontrado en donde se usa aprendizaje automático para resolver el problema inverso de valores propios, usa redes neuronales (Deep Learning) para hallar las constantes elásticas. En este trabajo se hace un preprocesamiento del espectro de frecuencias y se transforma en un ``modulated fingerprint''. Este ``modulated fingerprint'' se divide el espectro de frecuencias en "bins" que terminan transformados en una imagen. Esta imagen es la que se usa para entrenar la red neuronal \cite{Liu2023}. Se considerará estudiar este método de preprocesamiento de datos para este proyecto, ya que, puede facilitar la fase de entrenamiento de los datos.
-\\
-Existe otro trabajo donde se hace también un preprocesamiento de los datos, donde se transforma el espectro de frecuencias en una imagen, de tres capas, antes de entrenar a las redes neuronales. En este trabajo en específico se usan dos redes neuronales. Una red saca la información de las constantes en un ``Blackman Diagram'' y la otra red neuronal es una red de regresión \cite{Fukuda2023}. 
-\\
-Por otro lado también se han usado Redes Neuronales de manera directa para hallar las constantes elásticas de $LiNbO_3$ a la vez que se hallan las constantes de esfuerzo de los piezoeléctricos \cite{Yang2022}. También se ha usado redes neuronales para mapear espectros de frecuencias a dos distintas fases del material de $URu_{2}Si_{2} \cite{Ghosh2020}$. 
-\\
-Se puede observar que se han hecho trabajos donde se resuelve el problema inverso usando redes neuronales. No se encontraron usos distintos a las redes neuronales para resolver el problema inverso de la espectroscopía de resonancia ultrasónica. Esto da la oportunidad al presente proyecto a probar algoritmos distintos a las redes neuronales, aunque estas se tendran en cuenta en el proyecto. 
+El trabajo más reciente encontrado en donde se usa aprendizaje automático para resolver el problema inverso de valores propios, usa redes neuronales (Deep Learning) para hallar las constantes elásticas. En este trabajo se hace un preprocesamiento del espectro de frecuencias y se transforma en un ``modulated fingerprint''. Este ``modulated fingerprint'' se divide el espectro de frecuencias en ``bins''  que terminan transformados en una imagen. Esta imagen es la que se usa para entrenar la red neuronal \cite{Liu2023}. Se considerará estudiar este método de preprocesamiento de datos para este proyecto, ya que, puede facilitar la fase de entrenamiento de los datos.
+
+
+Existe otro trabajo donde se hace también un preprocesamiento de los datos, donde se transforma el espectro de frecuencias en una imagen, de tres capas, antes de entrenar a las redes neuronales. En este trabajo en específico se usan dos redes neuronales. Una red saca la información de las constantes en un ``Blackman Diagram'' y la otra red neuronal se encarga de determinar las constantes \cite{Fukuda2023}. 
+
+
+
+Por otro lado también se han usado redes neuronales de manera directa para hallar las constantes elásticas de $LiNbO_3$ a la vez que se hallan las constantes de esfuerzo de los piezoeléctricos \cite{Yang2022}. También se ha usado redes neuronales para mapear espectros de frecuencias a dos distintas fases del material de $URu_{2}Si_{2} \cite{Ghosh2020}$. 
+
+
+
+Se puede observar que se han hecho trabajos donde se resuelve el problema inverso usando redes neuronales. No se encontraron usos distintos a las redes neuronales para resolver el problema inverso de la espectroscopía de resonancia ultrasónica. Esto da la oportunidad al presente proyecto a probar algoritmos distintos a las redes neuronales, aunque estas se tendrán en cuenta. 
 
 \section{Objetivo General}
 
@@ -256,9 +267,10 @@ Construir modelos de aprendizaje automático consistentes que permitan determina
 %Objetivos espec�ficos del trabajo. Empiezan con un verbo en infinitivo.
 
 \begin{itemize}
-	\item Crear un código que permita hallar las frecuencias propias de una muestra sólida dada las constantes elásticas, dimensiones y densidad.
-	\item Generar grandes conjuntos de datos usando el código del forward problem que servirán de entrenamiento al modelo
-	\item Probar distintos modelos y entrenarlos con los datos generados.
+	\item Desarrollar software que permita hallar las frecuencias propias de una muestra sólida dada las constantes elásticas, dimensiones y densidad.
+	\item Generar grandes conjuntos de datos usando el software, que halla las frecuencias de resonancia, que servirán de entrenamiento al modelo. 
+	\item Validar varias frecuencias halladas con datos experimentales de muestras de constantes conocidas.
+	\item Entrenar distintos modelos con los datos generados y evaluar su desempeño
 \end{itemize}
 
 \section{Metodología}
@@ -267,11 +279,18 @@ Construir modelos de aprendizaje automático consistentes que permitan determina
 
 %Monograf�a te�rica o computacional: �C�mo se har�n los c�lculos te�ricos? �C�mo se har�n las simulaciones? �Qu� requerimientos computacionales se necesitan? �Qu� espacios f�sicos o virtuales se van a utilizar?
 
-Para lograr los objetivos planteados se creará un código que resuelva el problema de valores propios para halla las frecuencias dadas las constantes elásticas. Con este código se busca generar los datos para entrenar el modelo de aprendizaje automático que resolverá el problema inverso. El código construido  no solo generará datos de muestras paralelepípedas sino también muestras cilíndricas y muestras esféricas. Luego se harán mejoras a este código que permitan generar datos más rápido. Una de estas mejoras consiste en reorganizar el vector $\vec{a}$ con las matrices $\bm{E}$ y $\bm{\Gamma}$, de acuerdo a simetrías de reflexión, doble rotación e inversión, para que estas últimas sean diagonales en bloques. Al hacer las matrices diagonales en bloques se reduce drásticamente el tiempo computacional, lo que permite generar datos de manera mucho más rápida \cite{Leisure_1997}. 
-\\
-Una hecho el código que resuelve el problema de valores propios se procederá a generar grandes volúmenes de datos cambiando los parámetros de la forma de la muestra, densidad y constantes elásticas. Para la generación de estos datos se usara el cluster HPC de la Universidad. Una vez se ponen a trabajar las máquinas para la generación de datos, se trabajará paralelamente en investigar el funcionamiento de distintos algoritmos de aprendizaje automático y distintos algoritmos de boosting que sean candidatos para la resolución del problema inverso. Algunos algoritmos a los que se investigará su funcionamiento serán: Random Forest, Redes Neuronales y Rotation Forest. Algunos algoritmos de boosting que se investigarán para mejorar el desempeño de los anteriores algoritmos serán adaboost y xgboost. Mientras se hace esta tarea también se investigarán nuevos algoritmos que se vayan conociendo en el camino. 
-\\
-Una vez se hayan generado los datos se procederá a dividirlos en bloques de entrenamiento, validación y evaluación. Se entrenarán distintos modelos con los dichos datos de entrenamiento y se observará su desempeño con los datos de evaluación. Se escogerá el modelo con el mejor desempeño. También se considerará usar otras técnicas como el k-fold-cross-validation para evitar el "overfitting" en donde de dividen los datos en varios bloques, se entrena con los primeros $k-1$ bloques y se evalúa con el último bloque, luego se escoge otro bloque de evaluación y se entrena de nuevo el modelo con los bloques restantes y se vuelve evaluar, repitiendo el proceso k veces.  
+Para lograr los objetivos planteados se creará un código que resuelva el problema de valores propios para hallar las frecuencias dadas las constantes elásticas. Con este código se busca generar los datos para entrenar el modelo de aprendizaje automático que resolverá el problema inverso. El código construido  no solo generará datos de muestras paralelepípedas sino también muestras cilíndricas y muestras esféricas. Luego se harán mejoras a este código que permitan generar datos más rápido. Una de estas mejoras consiste en reorganizar el vector $\vec{a}$ con las matrices $\bm{E}$ y $\bm{\Gamma}$, de acuerdo a simetrías de reflexión, doble rotación e inversión, para que estas últimas sean diagonales en bloques. Al hacer las matrices diagonales en bloques se reduce drásticamente el tiempo computacional, lo que permite generar datos de manera mucho más rápida \cite{Leisure_1997}. 
+
+Una vez hecho el código que resuelve el problema de valores propios se procederá a calcular las frecuencias de resonancia de varias muestras con dimensiones, constantes elásticas, densidad y espectro de resonancia conocidas. Se compararán los valores propios hallados con el código con las frecuencias experimentales de cada muestra. 
+
+Luego se generarán grandes volúmenes de datos cambiando los parámetros de la forma de la muestra, densidad y constantes elásticas. Para la generación de estos datos se usará el clúster HPC de la Universidad de los Andes. Una vez se ponen a trabajar las máquinas para la generación de datos, se trabajará paralelamente en investigar el funcionamiento de distintos algoritmos de aprendizaje automático y distintos algoritmos de boosting que sean candidatos para la resolución del problema inverso. Algunos algoritmos a los que se investigará su funcionamiento serán: Random Forest, Redes Neuronales y Rotation Forest. Algunos algoritmos de boosting que se investigarán para mejorar el desempeño de los anteriores algoritmos serán adaboost y xgboost. Mientras se hace esta tarea también se investigarán nuevos algoritmos que se vayan conociendo durante el desarrollo del proyecto. 
+
+
+
+Una vez se hayan generado los datos se procederá a dividirlos en bloques de entrenamiento, validación y evaluación. Se entrenarán distintos modelos con los datos de entrenamiento y se observará su desempeño con los datos de evaluación. Se escogerá el modelo con el mejor desempeño. También se considerará usar otras técnicas como el k-fold-cross-validation para evitar el ``overfitting'' en donde de dividen los datos en varios bloques, se entrena con los primeros $k-1$ bloques y se evalúa con el último bloque, luego se escoge otro bloque de evaluación y se entrena de nuevo el modelo con los bloques restantes y se vuelve evaluar, repitiendo el proceso k veces.  
+
+
+
 \section{Cronograma}
 
 \begin{table}[H]
@@ -285,6 +304,7 @@ Una vez se hayan generado los datos se procederá a dividirlos en bloques de ent
 	4 &   &   &   & X & X & X & X & X & X & X & X & X & X & X & X & X \\
 	5 & X & X &   &   &   &   &   &   &   &   &   &   &   &   &   &   \\
 	6 &   &   &   &   &   &   &   &   &   &   &   &   &   & X & X & X \\
+	7 &   &   &   & X & X &   &   &   &   &   &   &   &   &   &   &   \\
 	\hline
 	\end{tabular}
 \end{table}
@@ -292,14 +312,13 @@ Una vez se hayan generado los datos se procederá a dividirlos en bloques de ent
 
 \begin{itemize}
 	\item Tarea 1: Escritura del documento de tesis.
-	\item Tarea 2: Creación del código que resuelve el problema de valores propios "forward problem"
-	\item Tarea 3: Generación de datos de frecuencias para entrenar los modelos de aprendizaje automático
-	\item Tarea 4: Investigación del funcionamiento de distintos algoritmos de aprendizaje automático y de distintos algoritmos de boosting
-	\item Tarea 5: Realización del curso de cluster HPC en Bloque Neón
-	\item Tarea 6: Entrenamiento de los algoritmos de aprendizaje automático encontrados
-\end{itemize}
-
-El segundo semestre de tesis se continuará con las tareas 1, 6 y otras que hayan quedado incompletas en el tercer semestre por imprevistos. 
+	\item Tarea 2: Creación del código que resuelve el problema de valores propios "forward problem".
+	\item Tarea 3: Generación de datos de frecuencias para entrenar los modelos de aprendizaje automático.
+	\item Tarea 4: Investigación del funcionamiento de distintos algoritmos de aprendizaje automático y de distintos algoritmos de boosting.
+	\item Tarea 5: Realización del curso de cluster HPC en Bloque Neón.
+	\item Tarea 6: Entrenamiento de los algoritmos de aprendizaje automático encontrados.
+	\item Tarea 7: Comparación de las frecuencias obtenidas con datos experimentales, de muestras cuyas constantes son conocidas. 
+\end{itemize} 
 
 \section{Personas Conocedoras del Tema}
 
@@ -307,6 +326,8 @@ El segundo semestre de tesis se continuará con las tareas 1, 6 y otras que haya
 
 \begin{itemize}
 	\item Paula Giraldo Gallo (Universidad de los Andes)
+	\item Edgar Alejandro Marañón León (Universidad de los Andes)
+	\item Fabio Arturo Rojas Mora (Universidad de los Andes)
 	\item Ferney Rodriguez Dueñas (Universidad de los Andes)
 \end{itemize}
 
