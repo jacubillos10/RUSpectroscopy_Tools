@@ -61,7 +61,7 @@ Mediante la técnica de la espectroscopía de resonancia ultrasónica (RUS por s
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{Img/Montaje_RUS.png}
-    \caption{Esquema del montaje experimental para el procedimiento de RUS \cite{Leisure_1997}.}
+    \caption{Esquema del montaje experimental para el procedimiento de RUS. Figura tomada de la referencia \cite{Leisure_1997}.}
     \label{fig:montaje_rus}
 \end{figure}
 
@@ -83,7 +83,7 @@ Por otro, se define el tensor de esfuerzos, $\bm{\sigma}$, que representa la fue
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.3]{Img/Stress_tensor.png}
-    \caption{Representación del tensor de esfuerzos en un elemento cúbico infinitesimal de una muestra \cite{oliveira2020}.}
+    \caption{Representación del tensor de esfuerzos en un elemento cúbico infinitesimal de una muestra. Figura tomada de la referencia \cite{oliveira2020}.}
     \label{fig:tensor_esfuerzos}
 \end{figure}
 
@@ -99,7 +99,7 @@ Se puede observar que el tensor de deformaciones es simétrico; es decir $\varep
 	C_{ijkl} = C_{ijlk}.
 \end{equation}
 
-Por otra parte, en ausencia de torques se tiene que $\sigma_{ij} = \sigma_{ji}$, es decir, $C_{ijkl}\varepsilon_{kl} = C_{jikl}\varepsilon_{kl}$, lo cual implica que: 
+Por otra parte, en ausencia de torques se tiene que $\sigma_{ij} = \sigma_{ji}$; es decir, $C_{ijkl}\varepsilon_{kl} = C_{jikl}\varepsilon_{kl}$, lo cual implica que: 
 \begin{equation}
 	C_{ijkl} = C_{jikl}.
 \end{equation}
@@ -123,7 +123,7 @@ Las relaciones de simetría encontradas permiten intercambiar los primeros dos �
 	1 & 2 & 3    		 \\	
 	\hline       
 	\end{tabular}
-	\caption{Transformación de pares de índices del tensor de elasticidad y del tensor de deformación}
+	\caption{Transformación de pares de índices del tensor de elasticidad y del tensor de deformación.}
 	\label{tab:my-table}
 \end{table}
 
@@ -144,7 +144,6 @@ Para determinar las frecuencias de resonancia de una muestra se planteará un la
 \begin{equation}
 	K = \frac{1}{2} \int_{V}{\rho \dot{u}^2} dV,
 \end{equation}
-
 donde $\rho$ es la densidad de la muestra, $V$ es el volumen y $\dot{u}$ es la velocidad de desplazamiento. Asumiendo un comportamiento periódico en el desplazamiento se puede decir que: $\dot{u} = \omega{u}$ y dado que $u^2 = \sum_{i=1}^{3}{u_i^2} = \sum_{i=1}^{3}{\sum_{k=1}^{3}{\delta_{ik}u_i u_k}}$, la energía cinética queda:
 
 \begin{equation}
@@ -176,13 +175,11 @@ Usando el método de Rayleigh-Ritz \cite{MIGLIORI19931} se puede expresar las fu
 	u_i = \sum_{\lambda,\mu,\nu=0}^{\lambda + \mu + \nu \le N_g}{a_{i\lambda\mu\nu} \phi_{i\lambda,\mu,\nu}},
 	\label{eq:funciones_base_general}
 \end{equation}
-
-donde $N_g$ es el grado máximo de las funciones base, y es un número escogido arbitrariamente. Entre mayor sea este número, mayor número de frecuencias se obtendrá del problema, sin embargo, el tiempo computacional también será mayor, ya que este aumenta cúbicamente a medida que aumenta $N_g$ \cite{Leisure_1997}. Un ejemplo de funciones base puede ser el siguiente \cite{Demarest}:
+donde $N_g$ es el grado máximo de las funciones base, y es un número escogido arbitrariamente. Entre mayor sea este número, mayor número de frecuencias se obtendrá del problema, sin embargo, el tiempo computacional también será mayor, ya que este aumenta en grado 9 a medida que aumenta $N_g$ \cite{Leisure_1997}. Un ejemplo de funciones base puede ser el siguiente \cite{Demarest}:
 \begin{equation}
     \phi_{i \lambda \mu \nu} = \left(\frac{x}{L_x} \right)^{\lambda} \left(\frac{y}{L_y} \right)^{\mu} \left(\frac{z}{L_z} \right)^{\nu},
 	\label{eq:funciones_base_potencias}
 \end{equation}
-
 donde $L_x$, $L_y$ y $L_z$ son las longitudes de la muestra en $x$, $y$ y $z$ respectivamente. Reemplazando la expresión \ref{eq:funciones_base_general} en las ecuaciones \ref{eq:K} y \ref{eq:U_cooked} se obtienen las siguientes expresiones para la energía cinética y potencial respectivamente:
 % Aquí falta otra sumatoria con los mu2, nu2...
 \begin{equation}
@@ -204,7 +201,6 @@ Los valores de las constantes $a_{i \lambda \mu \nu}$ se pueden organizar en un 
 \begin{equation}
 	U = \frac{1}{2} \vec{a}^{T}\bm{\Gamma}\vec{a},
 \end{equation}
-
 donde los elementos matriciales de $\bm{E}$ y $\bm{\Gamma}$ son los siguientes:
 
 \begin{equation}
@@ -232,9 +228,8 @@ Por ejemplo, usando las funciones base de la ecuación \ref{eq:funciones_base_po
 Así, la expresión para el lagrangiano es la siguiente: 
 
 \begin{equation}
-	\mathcal{L} = K - U = \frac{1}{2} \rho \omega^2 \vec{a}^{T}\bm{E}\vec{a} - \frac{1}{2} \vec{a}^{T}\bm{\Gamma}\vec{a}.
-\end{equation},
-
+	\mathcal{L} = K - U = \frac{1}{2} \rho \omega^2 \vec{a}^{T}\bm{E}\vec{a} - \frac{1}{2} \vec{a}^{T}\bm{\Gamma}\vec{a},
+\end{equation}
 donde $\vec{a}$ representa a los modos normales de vibración de la muestra. Extremizando este lagrangiano ($\frac{\partial \mathcal{L}}{\partial \vec{a}} = 0$) se obtiene un problema de valores propios generalizado. En estos valores propios se encontrarán las frecuencias de resonancia de la muestra:
 
 \begin{equation}
@@ -242,7 +237,7 @@ donde $\vec{a}$ representa a los modos normales de vibración de la muestra. Ext
 	\label{eq:eigenvalue-problem}
 \end{equation}
 
-Mediante la resolución de este problema de valores propios se hallan las frecuencias de resonancia de la muestra teniendo como parámetros sus constantes elásticas, dimensiones y densidad de la muestra. Sin embargo, el objetivo del presente proyecto es hacer el proceso inverso, es decir, crear un método para hallar las constantes elásticas a través de las frecuencias de las muestras obtenidas en el laboratorio. Para ello se probarán distintos modelos de aprendizaje automático, entrenados con datos generados en el problema de valores propios, para resolver el problema de hallar las constantes elásticas. 
+Mediante la resolución de este problema de valores propios se hallan las frecuencias de resonancia de la muestra teniendo como parámetros sus constantes elásticas, dimensiones y densidad de la muestra. Sin embargo, el objetivo del presente proyecto es hacer el proceso inverso; es decir, crear un método para hallar las constantes elásticas a través de las frecuencias de las muestras obtenidas en el laboratorio. Para ello se probarán distintos modelos de aprendizaje automático, entrenados con datos generados en el problema de valores propios, para resolver el problema de hallar las constantes elásticas. 
 
 \subsection{Estado del arte}
 
