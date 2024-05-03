@@ -10,6 +10,7 @@
 \usepackage{braket}
 \usepackage{datenumber}
 \usepackage{amsmath,bm}
+\usepackage{breqn}
 \usepackage{float}
 
 \usepackage{fancyhdr} % Add this package
@@ -27,7 +28,7 @@
 
 \begin{center}
 \Huge
-Numerical study of the elasticity tensor in the mechanical response of solids to resonant ultrasound modulation
+Estudio numérico del tensor de elasticidad en la respuesta mecánica de sólidos a la modulación de resonancia ultrasónica
 %Estudio numérico del tensor de elasticidad en la respuesta de los sólidos a la ¿modulación? ultrasónica resonante
 
 \vspace{3mm}
@@ -55,59 +56,60 @@ Las mediciones ultrasónicas han sido valiosas para el estudio de la materia con
 
 \subsection {Espectroscopía de resonancia ultrasónica}
 
-Mediante la técnica de la espectroscopía de resonancia ultrasónica (RUS por sus siglas en inglés) se puede obtener las mencionadas constantes elásticas. Esta consiste en colocar una muestra del sólido entre dos transductores piezoeléctricos que lo sostienen ligeramente \cite{MIGLIORI19931}. La muestra usualmente tiene formas bien definidas como paralelepípedos rectangulares o esferas y es excitada en un punto por uno de los transductores. Este transductor hace un barrido de frecuencias donde se encuentran varios modos de vibración de la muestra. Mientras el primer transductor hace oscilar la muestra, la respuesta resonante de esta es detectada por el otro transductor. De esta manera, se observa una respuesta amplificada cuando la frecuencia del primer transductor corresponde con la frecuencia de un modo de vibración propio de la muestra, de acuerdo al sistema cristalino de la muestra \cite{Leisure_1997}. La figura \ref{fig:montaje_rus} muestra cómo se coloca una muestra paralelepípeda entre los transductores.
+Mediante la técnica de la espectroscopía de resonancia ultrasónica (RUS por sus siglas en inglés) se puede obtener las mencionadas constantes elásticas. Esta consiste en colocar una muestra del sólido entre dos transductores piezoeléctricos que lo sostienen ligeramente \cite{MIGLIORI19931}. La muestra usualmente tiene formas bien definidas como paralelepípedos rectangulares o esferas y es excitada en un punto por uno de los transductores. Este transductor hace un barrido de frecuencias donde se encuentran varios modos de vibración de la muestra. Mientras el primer transductor hace oscilar la muestra, la respuesta resonante de esta es detectada por el otro transductor. De esta manera, se observa una respuesta amplificada cuando la frecuencia del primer transductor corresponde con la frecuencia de un modo de vibración propio, de acuerdo al sistema cristalino de la muestra \cite{Leisure_1997}. La figura \ref{fig:montaje_rus} muestra cómo se coloca una muestra paralelepípeda entre los transductores.
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{Img/Montaje_RUS.png}
-    \caption{Montaje experimental para el procedimiento de RUS \cite{Leisure_1997}}
+    \caption{Esquema del montaje experimental para el procedimiento de RUS \cite{Leisure_1997}.}
     \label{fig:montaje_rus}
 \end{figure}
 
-Se puede observar que la muestra solo se sostiene de las puntas. Esto permite que hayan condiciones de frontera libres en la muestra. Mas detalles del montaje experimental se pueden encontrar en la referencia \cite{MIGLIORI19931}.
+Se puede observar que la muestra solo se sostiene de las puntas. Esto permite que hayan condiciones de frontera libres en la muestra. Más detalles del montaje experimental se pueden encontrar en la referencia \cite{MIGLIORI19931}.
 
 \subsection{Los tensores de deformación, esfuerzo y elasticidad}
 
-La respuesta del material a distintos esfuerzos aplicados sobre este es gobernada por la ley generalizada de Hooke. Antes de plantear la ley generalizada de Hooke se definirá el tensor deformación, $\bm{\varepsilon}$ ,el cual se relaciona con los desplazamientos de cada punto del sólido de la siguiente manera:
+La respuesta de un material a distintos esfuerzos es gobernada por la ley generalizada de Hooke, la cual está relacionada al tensor de deformación $\bm{\varepsilon}$:
 
 \begin{equation}
-    \varepsilon_{ik} = \frac{1}{2} \left(\frac{\partial u_i}{\partial r_k} + \frac{\partial u_k}{\partial r_i} \right)
+    \varepsilon_{ik} = \frac{1}{2} \left(\frac{\partial u_i}{\partial r_k} + \frac{\partial u_k}{\partial r_i} \right).
 	\label{eq:deformación}
 \end{equation}
 
-El desplazamiento de un punto respecto a su punto de equilibrio es $\vec{u}_{(x,y,z)}$. Las componentes de cada vector son: $u_1 = u_x$, $u_2 = u_y$, $u_3 = u_z$, $r_1 = x$, $r_2 = y$ y $r_3 = z$.
+El desplazamiento de un punto respecto a su punto de equilibrio es $\vec{u}{(x,y,z)}$. Las componentes de cada vector son: $u_1 = u_x$, $u_2 = u_y$, $u_3 = u_z$, $r_1 = x$, $r_2 = y$ y $r_3 = z$.
 
 Por otro, se define el tensor de esfuerzos, $\bm{\sigma}$, que representa la fuerza por unidad de área que se aplica a un elemento cúbico infinitesimal de la muestra en cada una de las caras, tal como se muestra en la figura \ref{fig:tensor_esfuerzos} \cite{oliveira2020}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.3]{Img/Stress_tensor.png}
-    \caption{Representación del tensor de esfuerzos en un elemento cúbico infinitesimal de la muestra \cite{oliveira2020}}
+    \caption{Representación del tensor de esfuerzos en un elemento cúbico infinitesimal de una muestra \cite{oliveira2020}.}
     \label{fig:tensor_esfuerzos}
 \end{figure}
 
-Estos dos tensores se relacionan entre sí mediante la ley de Hooke generalizada, que se muestra a continuación:
+Estos dos tensores se relacionan entre sí mediante la ley de Hooke generalizada:
 \begin{equation}
-	\sigma_{ij} = C_{ijkl}\varepsilon_{kl},
+	\sigma_{ij} = \sum_{k=1}^{3}\sum_{l=1}^{3}C_{ijkl}\varepsilon_{kl},
 \end{equation}
 donde $C_{ijkl}$ es una componente del tensor de elasticidad o de constantes elásticas del material $\bm{C}$, el cual se busca obtener en el presente proyecto a partir de las frecuencias de resonancias dadas. 
 
 
-Se puede observar que el tensor de deformación es simétrico, es decir, $\varepsilon_{kl} = \varepsilon_{lk}$. Por un lado se tiene que $\sigma_{ij} = C_{ijkl}\varepsilon_{kl}$ y por otro lado se tiene que $\sigma_{ij} = C_{ijlk}\varepsilon_{lk}$. Al igualar las anteriores expresiones se tiene que:
+Se puede observar que el tensor de deformaciones es simétrico; es decir $\varepsilon_{kl} = \varepsilon_{lk}$. Por un lado se tiene que $\sigma_{ij} = C_{ijkl}\varepsilon_{kl}$ y por otro lado se tiene que $\sigma_{ij} = C_{ijlk}\varepsilon_{lk}$. Al igualar las anteriores expresiones se tiene que:
 \begin{equation}
 	C_{ijkl} = C_{ijlk}.
 \end{equation}
 
-Por otro lado, en ausencia de torques se tiene que $\sigma_{ij} = \sigma_{ji}$, es decir, $C_{ijkl}\varepsilon_{kl} = C_{jikl}\varepsilon_{kl}$, lo cual implica que: 
+Por otra parte, en ausencia de torques se tiene que $\sigma_{ij} = \sigma_{ji}$, es decir, $C_{ijkl}\varepsilon_{kl} = C_{jikl}\varepsilon_{kl}$, lo cual implica que: 
 \begin{equation}
 	C_{ijkl} = C_{jikl}.
 \end{equation}
-Las relaciones de simetría encontradas permiten intercambiar los primeros dos índices y los dos últimos indices del tensor de constantes elásticas. Esto reduce la cantidad constantes independientes de 81 a 36. Cada par de índices se puede organizar de 6 formas, es decir, se puede reescribir el tensor de constantes elásticas $\bm{C}$ como una matriz 6$\times$6, cambiando cada par de índices por uno nuevo de acuerdo al cuadro \ref{tab:my-table}.
+
+Las relaciones de simetría encontradas permiten intercambiar los primeros dos índices y los dos últimos indices del tensor de constantes elásticas. Esto reduce la cantidad constantes independientes de 81 a 36. Cada par de índices se puede organizar de 6 formas, es decir, se puede reescribir el tensor de constantes elásticas $\bm{C}$ como una matriz 6$\times$6, cambiando cada par de índices por uno nuevo de acuerdo al cuadro \ref{tab:my-table} [PENDIENTE!!].
 
 \begin{table}[H]
 	\centering
 	\begin{tabular}{lll}
-	índice i & índice j & índice nuevo m \\
+	índice \textit{i} & índice \textit{j} & índice nuevo \textit{m} \\
 	1 & 1 & 1            \\
 	2 & 2 & 2            \\
 	3 & 3 & 3            \\
@@ -119,14 +121,14 @@ Las relaciones de simetría encontradas permiten intercambiar los primeros dos �
 	\label{tab:my-table}
 \end{table}
 
-Este cambio de índices también permite escribir los tensores de deformación como vectores. Con estos nuevos índices se puede escribir la energía potencial elástica, por unidad de volumen, de la siguiente manera: 
+Este cambio de índices también permite escribir el tensor de deformaciones como un vector. Con estos nuevos índices se puede escribir la energía potencial elástica, por unidad de volumen, de la siguiente manera: 
 
 \begin{equation}
 	\mathcal{U} = \frac{1}{2} \sum_{m=1}^{3}{\sum_{n=1}^{3}{C_{mn}\varepsilon_{m}\varepsilon_{n}}}
 	\label{eq:u_vol}
 \end{equation}
 
-A partir de aquí se puede ver que los índices n y m se pueden intercambiar, lo cual implica que $C_{mn} = C_{nm}$. Regresando a la notación con los 4 índices se tiene que $C_{ijkl} = C_{klij}$. Con esto se tiene un tensor $\bm{C}$ con 21 constantes independientes en el caso mas general. 
+A partir de aquí se puede ver que los índices \textit{n} y \textit{m} se pueden intercambiar, lo cual implica que $C_{mn} = C_{nm}$. Regresando a la notación con los 4 índices se tiene que $C_{ijkl} = C_{klij}$. Con esto se tiene un tensor $\bm{C}$ con 21 constantes independientes en el caso más general. 
 
 
 \subsection{Planteamiento del problema de valores propios}
@@ -134,17 +136,17 @@ A partir de aquí se puede ver que los índices n y m se pueden intercambiar, lo
 Para determinar las frecuencias de resonancia de una muestra se planteará un lagrangiano que luego será extremizado. Por un lado la energía cinética total de la muestra viene siendo:
 
 \begin{equation}
-	K = \frac{1}{2} \int_{V}{\rho \dot{u}^2} dV
+	K = \frac{1}{2} \int_{V}{\rho \dot{u}^2} dV,
 \end{equation}
 
-La velocidad de desplazamiento de los puntos de la muestra va a estar dada por $\dot{u} = \omega{u}$ y dado que $u^2 = \sum_{i=1}^{3}{u_i^2} = \sum_{i=1}^{3}{\sum_{k=1}^{3}{\delta_{ik}u_i u_k}}$, la energía cinética queda:
+donde $\rho$ es la densidad de la muestra, $V$ es el volumen y $\dot{u}$ es la velocidad de desplazamiento. Asumiendo un comportamiento periódico en el desplazamiento se puede decir que: $\dot{u} = \omega{u}$ y dado que $u^2 = \sum_{i=1}^{3}{u_i^2} = \sum_{i=1}^{3}{\sum_{k=1}^{3}{\delta_{ik}u_i u_k}}$, la energía cinética queda:
 
 \begin{equation}
 	K = \frac{1}{2} \int_{V}{\rho \omega^2 \left(\sum_{i=1}^{3}{\sum_{k=1}^{3}{\delta_{il} u_i u_k}} \right) dV}.
 	\label{eq:K}
 \end{equation}
 
-Por otro lado, la energía potencial viene dada por la expresión \ref{eq:u_vol}. Esta se va a reescribir con la notación de 4 índices y se integrará sobre todo el volumen para obtener la energía potencial total: 
+Por otro lado, la densidad de energía potencial viene dada por la expresión \ref{eq:u_vol}. Esta se va a reescribir con la notación de 4 índices y se integrará sobre todo el volumen para obtener la energía potencial total: 
 
 \begin{equation}
 	U = \frac{1}{2} \int_{V}{\sum_{i=1}^{3}\sum_{j=1}^{3}\sum_{k=1}^{3}\sum_{l=1}^{3}{C_{ijkl}\varepsilon_{ij}\varepsilon_{kl}}dV}
@@ -163,7 +165,7 @@ Reemplazando el producto $\varepsilon_{ij}\varepsilon_{kl}$ en \ref{eq:U_raw}, s
 	\label{eq:U_cooked}
 \end{equation}
 
-Usando el método de Rayleigh-Ritz se pueden expresar las funciones $u_i$ en términos de funciones base $\phi_{i \lambda \mu \nu}$ de la siguiente manera: 
+Usando el método de Rayleigh-Ritz \cite{MIGLIORI19931} se puede expresar las funciones $u_i$ en términos de funciones base $\phi_{i \lambda \mu \nu}$ de la siguiente manera: 
 \begin{equation}
 	u_i = \sum_{\lambda,\mu,\nu=0}^{\lambda + \mu + \nu \le N_g}{a_{i\lambda\mu\nu} \phi_{i\lambda,\mu,\nu}},
 	\label{eq:funciones_base_general}
@@ -171,21 +173,20 @@ Usando el método de Rayleigh-Ritz se pueden expresar las funciones $u_i$ en té
 
 donde $N_g$ es el grado máximo de las funciones base, y es un número escogido arbitrariamente. Entre mayor sea este número, mayor número de frecuencias se obtendrá del problema, sin embargo, el tiempo computacional también será mayor, ya que este aumenta cúbicamente a medida que aumenta $N_g$ \cite{Leisure_1997}. Un ejemplo de funciones base puede ser el siguiente \cite{Demarest}:
 \begin{equation}
-    \phi_{i \lambda \mu \nu} = \left(\frac{x}{L_x} \right)^{\lambda} \left(\frac{y}{L_y} \right)^{\mu} \left(\frac{z}{L_z} \right)^{\nu}.
+    \phi_{i \lambda \mu \nu} = \left(\frac{x}{L_x} \right)^{\lambda} \left(\frac{y}{L_y} \right)^{\mu} \left(\frac{z}{L_z} \right)^{\nu},
 	\label{eq:funciones_base_potencias}
 \end{equation}
 
-Reemplazando la expresión \ref{eq:funciones_base_general} en las ecuaciones \ref{eq:K} y \ref{eq:U_cooked} se obtienen las siguientes expresiones para la energía cinética y potencial respectivamente:
+donde $L_x$, $L_y$ y $L_z$ son las longitudes de la muestra en $x$, $y$ y $z$ respectivamente. Reemplazando la expresión \ref{eq:funciones_base_general} en las ecuaciones \ref{eq:K} y \ref{eq:U_cooked} se obtienen las siguientes expresiones para la energía cinética y potencial respectivamente:
 % Aquí falta otra sumatoria con los mu2, nu2...
 \begin{equation}
 	K = \frac{1}{2} \rho \omega^2 \sum_{i=1}^{3}\sum_{k=1}^{3}\sum_{\Scale[0.5]{\lambda_1,\mu_1,\nu_1 = 0}}^{\Scale[0.5]{\lambda_1 + \mu_1 + \nu_1 \le N_g}} \sum_{\Scale[0.5]{\lambda_2,\mu_2,\nu_2 = 0}}^{\Scale[0.5]{\lambda_2 + \mu_2 + \nu_2 \le N_g}} {a_{i \lambda_1 \mu_1 \nu_1} \left(\int_{V} {\delta_{ik} \phi_{i \lambda_1 \mu_1 \nu_1} \phi_{k \lambda_2 \mu_2 \nu_2} dV} \right) a_{k \lambda_2 \mu_2 \nu_2}},
 	\label{eq:K_final}
 \end{equation}
-\begin{equation}
-	\centering
-	U = \frac{1}{2} \sum_{i=1}^{3}\sum_{k=1}^{3}\sum_{\Scale[0.5]{\lambda_1,\mu_1,\nu_1 = 0}}^{\Scale[0.5]{\lambda_1 + \mu_1 + \nu_1 \le N_g}} \sum_{\Scale[0.5]{\lambda_2,\mu_2,\nu_2 = 0}}^{\Scale[0.5]{\lambda_2 + \mu_2 + \nu_2 \le N_g}} {a_{i \lambda_1 \mu_1 \nu_1}\left(\sum_{j=1}^{3}\sum_{l=1}^{3} C_{ijkl}\int_{V} { \frac{\partial \phi_{i \lambda_1 \mu_1 \nu_1}}{\partial r_j} \frac{\partial \phi_{k \lambda_2 \mu_2 \nu_2}}{\partial r_l} dV} \right) a_{k \lambda_2 \mu_2 \nu_2}}.
+\begin{align}
+	U = &\;\frac{1}{2} \sum_{i=1}^{3}\sum_{k=1}^{3}\sum_{\Scale[0.5]{\lambda_1,\mu_1,\nu_1 = 0}}^{\Scale[0.5]{\lambda_1 + \mu_1 + \nu_1 \le N_g}} \sum_{\Scale[0.5]{\lambda_2,\mu_2,\nu_2 = 0}}^{\Scale[0.5]{\lambda_2 + \mu_2 + \nu_2 \le N_g}} a_{i \lambda_1 \mu_1 \nu_1} \cdots \nonumber \\ &\left(\sum_{j=1}^{3}\sum_{l=1}^{3} C_{ijkl}\int_{V} { \frac{\partial \phi_{i \lambda_1 \mu_1 \nu_1}}{\partial r_j} \frac{\partial \phi_{k \lambda_2 \mu_2 \nu_2}}{\partial r_l} dV} \right) a_{k \lambda_2 \mu_2 \nu_2}.
 	\label{eq:U_final}
-\end{equation}
+\end{align}
 
 Los valores de las constantes $a_{i \lambda \mu \nu}$ se pueden organizar en un vector $\vec{a}$, mientras que los paréntesis en las ecuaciones \ref{eq:K_final} y \ref{eq:U_final} se pueden reorganizar en matrices. De esta manera, podemos expresar la energía cinética y la energía potencial en términos de productos de vectores y matrices: 
 
@@ -210,7 +211,7 @@ donde los elementos matriciales de $\bm{E}$ y $\bm{\Gamma}$ son los siguientes:
 	\label{eq:matriz_gamma}
 \end{equation}
 
-Por ejemplo, usando las funciones base de la ecuación \ref{eq:funciones_base_potencias} y con una muestra de forma paralelepípeda con dimensiones $L_x$, $L_y$ y $L_z$, se tiene que los elementos de las matrices $\bm{E}$ y $\bm{\Gamma}$, con los valores de $x$, $y$ y $z$ adimensionalizados, son \cite{Ohno}:
+Por ejemplo, usando las funciones base de la ecuación \ref{eq:funciones_base_potencias} y con una muestra de forma paralelepípeda rectangular con dimensiones $L_x$, $L_y$ y $L_z$, se tiene que los elementos de las matrices $\bm{E}$ y $\bm{\Gamma}$, con los valores de $x$, $y$ y $z$ adimensionalizados, son \cite{Ohno}:
 \begin{equation}
 	E_{i \lambda_1 \mu_1 \nu_1; k \lambda_2 \mu_2 \nu_2} = \int_{-1}^{1} \int_{-1}^{1} \int_{-1}^{1} {\delta_{ik} x^{\lambda_1 + \lambda_2} y^{\mu_1 + \mu_2} z^{\nu_1 + \nu_2} dx dy dz}
 	\label{eq:matriz_E_paralelepípedo_pot}
@@ -226,20 +227,20 @@ Así, la expresión para el lagrangiano es la siguiente:
 
 \begin{equation}
 	\mathcal{L} = K - U = \frac{1}{2} \rho \omega^2 \vec{a}^{T}\bm{E}\vec{a} - \frac{1}{2} \vec{a}^{T}\bm{\Gamma}\vec{a}.
-\end{equation}
+\end{equation},
 
-Extremizando este lagrangiano ($\frac{\partial \mathcal{L}}{\partial \vec{a}} = 0$) se obtiene un problema de valores propios generalizado. En estos valores propios se encontrarán las frecuencias de resonancia de la muestra:
+donde $\vec{a}$ representa a los modos normales de vibración de la muestra. Extremizando este lagrangiano ($\frac{\partial \mathcal{L}}{\partial \vec{a}} = 0$) se obtiene un problema de valores propios generalizado. En estos valores propios se encontrarán las frecuencias de resonancia de la muestra:
 
 \begin{equation}
 	\rho \omega^2 \bm{E} \vec{a} = \bm{\Gamma} \vec{a}.
 	\label{eq:eigenvalue-problem}
 \end{equation}
 
-Mediante la resolución de este problema de valores propios se hallan las frecuencias de resonancia de la muestra teniendo como parámetros sus constantes elásticas, dimensiones y densidad. Sin embargo, el objetivo del presente proyecto es hacer el proceso inverso, es decir, crear un método para hallar las constantes elásticas a través de las frecuencias de las muestras obtenidas en el laboratorio. Para ello se probarán distintos modelos de aprendizaje automático, entrenados con datos generados en el problema de valores propios, para resolver el problema de hallar las constantes. 
+Mediante la resolución de este problema de valores propios se hallan las frecuencias de resonancia de la muestra teniendo como parámetros sus constantes elásticas, dimensiones y densidad de la muestra. Sin embargo, el objetivo del presente proyecto es hacer el proceso inverso, es decir, crear un método para hallar las constantes elásticas a través de las frecuencias de las muestras obtenidas en el laboratorio. Para ello se probarán distintos modelos de aprendizaje automático, entrenados con datos generados en el problema de valores propios, para resolver el problema de hallar las constantes elásticas. 
 
 \subsection{Estado del arte}
 
-El trabajo mas reciente encontrado en donde se usa aprendizaje automático para resolver el problema inverso de valores propios usa redes neuronales (Deep Learning) para hallar las constantes elásticas. En este trabajo se hace un preprocesamiento del espectro de frecuencias y se transforma en un ``modulated fingerprint''. Este ``modulated fingerprint'' se divide el espectro de frecuencias en "bins" que terminan transformados en una imagen. Esta imagen es la que se usa para entrenar la red neuronal \cite{Liu2023}. Se considerará estudiar este método de preprocesamiento de datos para este proyecto, ya que, puede facilitar la fase de entrenamiento de los datos.
+El trabajo más reciente encontrado en donde se usa aprendizaje automático para resolver el problema inverso de valores propios, usa redes neuronales (Deep Learning) para hallar las constantes elásticas. En este trabajo se hace un preprocesamiento del espectro de frecuencias y se transforma en un ``modulated fingerprint''. Este ``modulated fingerprint'' se divide el espectro de frecuencias en "bins" que terminan transformados en una imagen. Esta imagen es la que se usa para entrenar la red neuronal \cite{Liu2023}. Se considerará estudiar este método de preprocesamiento de datos para este proyecto, ya que, puede facilitar la fase de entrenamiento de los datos.
 \\
 Existe otro trabajo donde se hace también un preprocesamiento de los datos, donde se transforma el espectro de frecuencias en una imagen, de tres capas, antes de entrenar a las redes neuronales. En este trabajo en específico se usan dos redes neuronales. Una red saca la información de las constantes en un ``Blackman Diagram'' y la otra red neuronal es una red de regresión \cite{Fukuda2023}. 
 \\
@@ -310,7 +311,8 @@ El segundo semestre de tesis se continuará con las tareas 1, 6 y otras que haya
 \end{itemize}
 
 
-\bibliographystyle{abbrv}
+%bibliographystyle{abbrv}
+\bibliographystyle{ieeetr}
 \bibliography{Referencias}
 
 \section*{Firma del Director}
