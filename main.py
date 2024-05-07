@@ -1,6 +1,7 @@
 import RUS_classes as rus
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     num = int(sys.stdin.readline().strip())
@@ -20,10 +21,6 @@ if __name__ == "__main__":
         w2 = Forward.W2
         amps = Forward.Amps
         fs = []
-        for w in range(len(w2)):
-            frec = w2[w]/rho
-            fr = frec**(1/2)
-            f = fr/(2*np.pi)
-            fs.append(f)
-            sys.stdout.write(str(f))
-            sys.stdout.write("\n")
+        fs = [((w/rho)**(1/2))/(2*np.pi) for w in w2]
+        sys.stdout.write(str(fs))
+        
