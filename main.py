@@ -23,7 +23,7 @@ print(vals[0])
 
 vals = (vals/rho)**0.5
 vals_vueltas = vals*(1/(2*np.pi))
-np.savetxt(nombre_archivo[:-4] + '_const_.csv', np.c_[range(len(vals)),vals, vals_vueltas], delimiter = ',')
+np.savetxt(nombre_archivo[:-4] + '_freq_.csv', np.c_[range(len(vals)),vals, vals_vueltas], delimiter = ',')
 
 print("N vals: ", len(vals))
 

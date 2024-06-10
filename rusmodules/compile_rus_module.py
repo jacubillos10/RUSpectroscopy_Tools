@@ -32,6 +32,7 @@ def generate_term_in_ſ(exp_index1, exp_index2, i1, i2, j1, j2, C, geo_par):
     """
     This function generates one term of the sum composing an element of the matrix ſ. See equation 11 in Leisure 1997. Be sure geo_par
     to be an array of floats NOT INTEGERS!!
+    THIS ONE IS AFFECTED BY THE SHAPE OF THE SAMPLE
     @Input exp_index1 <np.array>: Exponents lambda, mu and nu of the p element in the matrix and i1 index
     @Input exp_index2 <np.array>: Exponents lambda, mu and nu of the q element in the matrix and i2 index
     @Input i1 <int>: index i of the expresion in eq 11. 0 to x, 1 to y, 2 to z
@@ -62,7 +63,7 @@ def generate_term_in_ſ(exp_index1, exp_index2, i1, i2, j1, j2, C, geo_par):
 def generate_matrix_element_ſ(i1, i2, exp_index1, exp_index2, C, geo_par):
     """
     This function generates a matrix element of ſ, given two axis indexes (0 is x, 1 is y, 2 is z), two arrays of indexes which
-    contain the exponents of the power series, the elastic constants and the geometric parameters
+    Contain the exponents of the power series, the elastic constants and the geometric parameters
     @Input i1 <int>: index i of the expresion in eq 11. 0 to x, 1 to y, 2 to z
     @Input i2 <int>: index i' of the expresion in eq 11. 0 to x, 1 to y, 2 to z
     @Input exp_index1 <np.array>: Exponents lambda, mu and nu of the p element in the matrix and i1 index
@@ -83,6 +84,11 @@ def generate_matrix_element_ſ(i1, i2, exp_index1, exp_index2, C, geo_par):
 @njit("f8(i8,i8,i8[:],i8[:])")
 @cc.export("generate_matrix_element_E", "f8(i8,i8,i8[:],i8[:])")
 def generate_matrix_element_E(i1, i2, exp_index1, exp_index2):
+    """
+    This function generates a matrix element of E, given two axis indexes (0 is x, 1 is y, 2 is z), two arrays of indexes which
+    contain the exponents of the power series, the elastic constants and the geometric parameters. 
+    THIS ONE IS AFFECTED BY THE SHAPE OF THE SAMPLE 
+    """
     if i1 != i2:
         return 0
     else:
@@ -154,7 +160,7 @@ def gamma_matrix(N, C, geo_par):
 
 if __name__ == "__main__":
     cc.compile()
-    C_const = np.genfromtxt('constantes.csv', delimiter=',', skip_header=0, dtype=float)
+    #C_const = np.genfromtxt('constantes.csv', delimiter=',', skip_header=0, dtype=float)
     #aa = generate_term_in_ſ(np.array([1, 0, 0]), np.array([0, 0, 1]), 0, 1, 0, 2, C_const, np.array([1.0, 1.0, 1.0]))
     #print(aa)
     #aac = generate_matrix_element_ſ(0, 1, np.array([1,0,0]), np.array([0,0,1]), C_const, np.array([1.0,1.0,1.0]))
