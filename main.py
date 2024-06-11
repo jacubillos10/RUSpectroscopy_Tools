@@ -5,6 +5,7 @@ import scipy
 import matplotlib.pyplot as plt
 import time
 
+shape = 1 # 0: parallelepiped, 1: cilinder
 """
 #Datos del FeGa
 Ng = 12
@@ -21,7 +22,7 @@ nombre_archivo = 'constantesSmB6.csv' #Mbar
 
 #Datos del URu2Si2
 Ng = 14
-rho = 9.839 #g/cm^3
+rho = 9.839 #g/cm^3 
 nombre_archivo = 'constantesURu2Si2.csv' #Mbar
 
 
@@ -29,8 +30,10 @@ C_const = np.genfromtxt(nombre_archivo, delimiter=',', skip_header=0, dtype=floa
 #geometry = np.array([0.30529,0.20353,0.25334]) #cm  FeGa
 #geometry = np.array([0.10872, 0.13981, 0.01757]) #cm SmB6
 geometry = np.array([0.29605, 0.31034, 0.29138]) #cm URu2Si2
-gamma = rus.gamma_matrix(Ng, C_const, geometry)
-E = rus.E_matrix(Ng)
+#Note que el doble factorial de 2 tiró un segfault. En algún momento puede estar pasando esto. 
+print(rus.fact2(-1))
+gamma = rus.gamma_matrix(Ng, C_const, geometry, shape)
+E = rus.E_matrix(Ng, shape)
 
 vals, vects = scipy.linalg.eigh(a = gamma, b = E)
 
@@ -40,7 +43,7 @@ print(vals[0])
 
 vals = (vals/rho)**0.5
 vals_vueltas = vals*(1/(2*np.pi))
-np.savetxt(nombre_archivo[:-4] + '_freq_.csv', np.c_[range(len(vals)),vals, vals_vueltas], delimiter = ',')
+np.savetxt(nombre_archivo[:-4] + '_freq_' + str(shape) +'.csv', np.c_[range(len(vals)),vals, vals_vueltas], delimiter = ',')
 
 print("N vals: ", len(vals))
 
