@@ -66,10 +66,9 @@ def generate_term_in_ſ(exp_index1, exp_index2, i1, i2, j1, j2, C, geo_par, opti
     #fin if 
     P = C[it_c(i1,j1),it_c(i2,j2)]/(geo_par[j1]*geo_par[j2])
     if options == 1:
-        delta1 = 1 if j1 == 2 else 0
-        delta2 = 1 if j2 == 2 else 0
-        a = 2**(delta1 + delta2)
-        R = a*(fact2(coeff[0] - 2)*fact2(coeff[1] - 2))/(fact2(coeff[0] + coeff[1])*coeff[2])
+        R = 4*(fact2(coeff[0] - 2)*fact2(coeff[1] - 2))/(fact2(coeff[0] + coeff[1])*coeff[2])
+    elif options == 2:
+        R = 4*(fact2(coeff[0] - 2)*fact2(coeff[1] - 2)*fact2(coeff[2] - 2))/(fact2(sum(coeff)))
     else:
         R = 4/(coeff[0]*coeff[1]*coeff[2])
     #fin if 
@@ -115,7 +114,9 @@ def generate_matrix_element_E(i1, i2, exp_index1, exp_index2, options):
             return 0
         #fin if
         if options == 1:
-            R = (fact2(coeff[0] - 2)*fact2(coeff[1] - 2))/(fact2(coeff[0] + coeff[1])*coeff[2]) 
+            R = (fact2(coeff[0] - 2)*fact2(coeff[1] - 2))/(fact2(coeff[0] + coeff[1])*coeff[2])
+        elif options == 2:
+            R = (fact2(coeff[0] - 2)*fact2(coeff[1] - 2)*fact2(coeff[2] - 2))/(fact2(sum(coeff)))
         else:
             R = 1/(coeff[0]*coeff[1]*coeff[2])
         #fin if 
