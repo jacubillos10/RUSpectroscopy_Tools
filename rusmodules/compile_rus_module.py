@@ -64,14 +64,23 @@ def generate_term_in_ſ(exp_index1, exp_index2, i1, i2, j1, j2, C, geo_par, opti
     if Q == 0 or S == 0:
         return 0
     #fin if 
-    P = C[it_c(i1,j1),it_c(i2,j2)]/(geo_par[j1]*geo_par[j2])
     if options == 1:
-        R = 4*(fact2(coeff[0] - 2)*fact2(coeff[1] - 2))/(fact2(coeff[0] + coeff[1])*coeff[2])
+        R = (fact2(coeff[0] - 2)*fact2(coeff[1] - 2))/(fact2(coeff[0] + coeff[1])*coeff[2])
+        alpha = np.pi/4
     elif options == 2:
-        R = 4*(fact2(coeff[0] - 2)*fact2(coeff[1] - 2)*fact2(coeff[2] - 2))/(fact2(sum(coeff)))
+        R = (fact2(coeff[0] - 2)*fact2(coeff[1] - 2)*fact2(coeff[2] - 2))/(fact2(sum(coeff)))
+        alpha = np.pi/6
     else:
-        R = 4/(coeff[0]*coeff[1]*coeff[2])
+        R = 1/(coeff[0]*coeff[1]*coeff[2])
+        alpha = 1
     #fin if 
+    #P = 4*C[it_c(i1,j1),it_c(i2,j2)]/(geo_par[j1]*geo_par[j2])
+    if j1 == j2:
+        beta = np.prod(geo_par)/(geo_par[j1]**2)
+    else:
+        beta = geo_par[3-j1-j2]
+    #fin if 
+    P = 4*alpha*C[it_c(i1,j1),it_c(i2,j2)]*beta
     return P*Q*S*R
 #fin función    
 

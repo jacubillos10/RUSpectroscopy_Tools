@@ -9,12 +9,11 @@ C_ranks = (0.3, 5.6)
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 
-def generate_eigenvalues(Dimensions, C_rank, Crystal_structure, Shape, Density, N_frequencies, Ng, Verbose = False):
+def generate_eigenvalues(Dimensions, C_rank, Crystal_structure, Shape, N_frequencies, Ng, Verbose = False):
     dims = np.random.uniform(Dimensions["Min"], Dimensions["Max"])
     C = data_generator.generate_C_matrix(C_rank[0], C_rank[1], Crystal_structure)
     gamma = rus.gamma_matrix(Ng, C, dims, Shape)
     E = rus.E_matrix(Ng, Shape)
-    rho = np.random.uniform(Density[0], Density[1])
     N_freq = N_frequencies
     vals, vects = scipy.linalg.eigh(a = gamma, b = E)
     norma_gamma = np.linalg.norm(gamma - gamma.T)
@@ -38,9 +37,8 @@ def generate_eigenvalues(Dimensions, C_rank, Crystal_structure, Shape, Density, 
     if N_freq == "all":
         N_freq = len(vals)
     #fin if 
-    omega2 = vals/rho
     C_reshaped = np.r_[*(C[i,i:] for i in range(6))]
-    return np.r_[rho, dims, C_reshaped, omega2[6:N_freq]]
+    return np.r_[dims, C_reshaped, vals[6:N_freq]]
 #fin funcion
 
 input_data = { 
@@ -52,9 +50,8 @@ input_data = {
                 "C_rank": C_ranks,
                 "Crystal_structure": 0,
                 "Shape": 0,
-                "Density": (4.0,10.0),
                 "Verbose": False,
-                "N_frequencies": 25,
+                "N_frequencies": 24,
                 "Ng": 14
               }
 
