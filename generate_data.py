@@ -4,31 +4,43 @@ from rusmodules import rus
 from rusmodules import data_generator
 import scipy 
 
+np.set_printoptions(suppress = True)
 C_ranks = (0.3, 5.6)
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 
-def generate_eigenvalues(**kwargs):
-    dims = np.random.uniform(kwargs["Dimensions"]["Min"], kwargs["Dimensions"]["Max"])
-    C = data_generator.generate_C_matrix(kwargs["C_Rank"][0], kwargs["C_Rank"][1], kwargs["Crystal_structure"])
-    gamma = rus.gamma_matrix(kwargs["Ng"], C, dims, kwargs["Shape"])
-    E = rus.E_matrix(kwargs["Ng"], kwargs["Shape"])
+def generate_eigenvalues(Dimensions, C_rank, Crystal_structure, Shape, Density, N_frequencies, Ng, Verbose = False):
+    dims = np.random.uniform(Dimensions["Min"], Dimensions["Max"])
+    C = data_generator.generate_C_matrix(C_rank[0], C_rank[1], Crystal_structure)
+    gamma = rus.gamma_matrix(Ng, C, dims, Shape)
+    E = rus.E_matrix(Ng, Shape)
+    rho = np.random.uniform(Density[0], Density[1])
+    N_freq = N_frequencies
     vals, vects = scipy.linalg.eigh(a = gamma, b = E)
     norma_gamma = np.linalg.norm(gamma - gamma.T)
     norma_E = np.linalg.norm(E - E.T)
     tol = 1e-7
-    if "Verbose" in kwargs.keys() and kwargs["Verbose"]:
+    if Verbose:
         print("**** C_matrix: *****")
         print(C)
         print("*** dimensions: ***")
         print(dims)
+        print("*** end verbose ***")
     #fin if 
     if abs(norma_gamma) > tol or abs(norma_E) > tol:
         print("Norma gamma: ", norma_gamma)
         print("Norma E: ", norma_E)
         raise ArithmeticError("Either gamma or E is non-symetric")
+    #fin if
+    if any((abs(vals[i]) > tol for i in range(6))):
+        raise ArithmeticError("One of the first six eigenvalues is not zero")
+    #fin if
+    if N_freq == "all":
+        N_freq = len(vals)
     #fin if 
-    return vals
+    omega2 = vals/rho
+    C_reshaped = np.r_[*(C[i,i:] for i in range(6))]
+    return np.r_[rho, dims, C_reshaped, omega2[6:N_freq]]
 #fin funcion
 
 input_data = { 
@@ -37,17 +49,15 @@ input_data = {
                     "Min": dim_min,
                     "Max": dim_max
                 },
-                "C_Rank": C_ranks,
+                "C_rank": C_ranks,
                 "Crystal_structure": 0,
                 "Shape": 0,
-                "Verbose": True,
+                "Density": (4.0,10.0),
+                "Verbose": False,
+                "N_frequencies": 25,
                 "Ng": 14
               }
 
 
 sample1 = generate_eigenvalues(**input_data)
-#print(sample1)
-print("**** First 6 eigenvalues:  ****")
-print(sample1[0:6])
-print("**** The rest of the eigenvalues: ****")
-print(sample1[6:])
+print(sample1)
