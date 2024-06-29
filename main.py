@@ -1,12 +1,13 @@
 import numpy as np
 import rusmodules
 from rusmodules import rus
+from rusmodules import rus_test
 import scipy
 import matplotlib.pyplot as plt
 import time
 
 np.set_printoptions(suppress = True)
-shape = 1 # 0: parallelepiped, 1: cilinder, 2: ellipsoid 
+shape = 2 # 0: parallelepiped, 1: cilinder, 2: ellipsoid 
 """
 #Datos del FeGa
 Ng = 12
@@ -49,6 +50,17 @@ np.savetxt(nombre_archivo[:-4] + '_freq_' + str(shape) +'.csv', np.c_[range(len(
 print("N vals: ", len(vals))
 print(freq_vueltas[6:6+12])
 print(vals[6:6+12])
+
+gamma2 = rus_test.gamma_matrix(Ng, C_const, geometry, shape)
+E2 = rus_test.E_matrix(Ng, shape)
+vals2, vect2 = scipy.linalg.eigh(a = (m**(-1/3)*gamma2), b = E2)
+print("Norma2: ", np.linalg.norm(gamma2 - gamma2.T))
+print("Norma2: ", np.linalg.norm(E2 - E2.T)) 
+print("N vals: ", len(vals2))
+freq2 = (vals2/(m**(2/3)))**0.5
+freq2_vueltas = freq2*(1/(2*np.pi))
+print(freq_vueltas[6:6+12])
+print(vals2[6:6+12])
 
 #time.sleep(5)
 

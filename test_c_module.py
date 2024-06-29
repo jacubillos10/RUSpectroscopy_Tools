@@ -3,9 +3,9 @@ from rusmodules import rus_test
 from rusmodules import rus
 
 np.set_printoptions(suppress = True)
-shape = 2 # 0: parallelepiped, 1: cilinder, 2: ellipsoid 
+shape = 1 # 0: parallelepiped, 1: cilinder, 2: ellipsoid 
 
-A = 2
+A = 8
 #Datos del URu2Si2
 Ng = 14
 m = (A**3)*0.2634 #g 9.84029 #9.839 #g/cm^3 
@@ -16,8 +16,8 @@ nombre_archivo = 'constantes.csv'
 C_const = np.genfromtxt(nombre_archivo, delimiter=',', skip_header=0, dtype=float)
 geometry = A*np.array([0.29605, 0.31034, 0.29138]) #cm URu2Si2
 
-exp_index1 = np.array([30,6,6])
-exp_index2 = np.array([30,2,8])
+exp_index1 = np.array([2,6,6])
+exp_index2 = np.array([4,2,8])
 exp_index1_t = np.array(exp_index1, dtype = np.int32)
 exp_index2_t = np.array(exp_index2, dtype = np.int32)
 i1 = 0 

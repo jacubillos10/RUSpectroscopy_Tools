@@ -109,6 +109,164 @@ double generate_E_matrix_element(int i1, int i2, int exp_index1[3], int exp_inde
 	}
 }
 
+// Function to generate combinations
+int **generate_combinations(int N) {
+    int R = ((N + 1) * (N + 2) * (N + 3))/6;
+
+    // Allocate memory for the combinations array
+    int **combi = (int **)malloc(R * sizeof(int *));
+    for (int i = 0; i < R; i++) 
+	{
+        combi[i] = (int *)malloc(3 * sizeof(int));
+    }
+
+    int l = 0;
+    for (int n = 0; n <= N; n++) {
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j <= n - i; j++) {
+                int k = n - i - j;
+                combi[l][0] = i;
+                combi[l][1] = j;
+                combi[l][2] = k;
+                l++;
+            }
+        }
+    }
+    return combi;
+}
+
+
+// Function to free allocated memory
+void free_combinations(int **combi, int total_combinations) {
+    for (int i = 0; i < total_combinations; i++) {
+        free(combi[i]);
+    }
+    free(combi);
+}
+
+PyObject  *gamma_matrix_py(PyObject *self, PyObject *args)
+{
+	PyArrayObject *C, *geo_par;
+	int N, options;
+	
+	if (!PyArg_ParseTuple(args, "iO!O!i", &N, &PyArray_Type, &C, &PyArray_Type, &geo_par, &options))
+	{
+		return NULL;
+	}
+
+	if (!PyArray_Check(C) || !PyArray_Check(geo_par))
+	{
+		PyErr_SetString(PyExc_TypeError, "Expected numpy arrays for C and geo_par");
+		return NULL;
+	}
+	double *geo_par_data = (double *)PyArray_DATA(geo_par);
+	double (*C_data)[6] = (double (*)[6])PyArray_DATA(C);
+
+	if (PyArray_NDIM(geo_par) != 1 || PyArray_DIM(geo_par, 0) != 3 || 
+			PyArray_NDIM(C) != 2 || PyArray_DIM(C, 0) != 6 || PyArray_DIM(C, 1) != 6)
+	{
+		PyErr_SetString(PyExc_ValueError, "C must be an np.array of dimensions (6,6) and geo_par must be an array of dimensions (3,)");
+		return NULL;
+	}
+	/*
+	 * Aquí se empieza a escribir la función de verdad. Bueno casi. Aquí definimos que tan grande queremos que sea la matriz de respuesta 
+	 */
+	int R = ((N + 1)*(N + 2)*(N + 3))/6;
+	npy_intp dims[2] = {3*R, 3*R};
+	PyObject *gamma_array = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+	if (gamma_array == NULL)
+	{
+		PyErr_SetString(PyExc_MemoryError, "Gamma array memory could be not allocated");
+		return NULL;
+	}
+	double *gamma_data = (double *)PyArray_DATA((PyArrayObject *)gamma_array);
+	/*
+	 * Ahora sí aquí empiezas a codificar la lógica de la función 
+	 */
+	 int **combi;
+	 combi = generate_combinations(N); //Recuerde que el primer índice de combi es la combinación específica y el segundo va de cero a 2
+	 if (combi == NULL) 
+	 {
+		 PyErr_SetString(PyExc_MemoryError, "Combinations array memory could not be allocated");
+		 Py_DECREF(gamma_array); // Free gamma_array if combi allocation fails
+		 return NULL;
+     }			
+
+	 for (int i = 0; i < 3; i++)
+	 {
+		 for (int k = 0; k < 3; k++)
+		 {
+			 for (int lm = 0; lm < R; lm++)
+			 {
+				 for (int lf = 0; lf < R; lf++)
+				 {
+					 int exp_index1[3];
+					 int exp_index2[3];
+					 for (int ind = 0; ind < 3; ind++)
+					 {
+						 exp_index1[ind] = combi[lm][ind];
+						 exp_index2[ind] = combi[lf][ind]; 
+					 }
+					 gamma_data[3*R*(i*R +lm) + (k*R + lf)] = generate_gamma_matrix_element(i, k, exp_index1, exp_index2, C_data, geo_par_data, options);
+				 }
+			 }
+		 } 
+	 }
+	 free_combinations(combi, R);
+	 return gamma_array;
+
+}
+
+PyObject *E_matrix_py(PyObject *self, PyObject *args)
+{
+	int N, options;
+	if (!PyArg_ParseTuple(args, "ii", &N, &options))
+	{
+		return NULL;
+	}
+	int R = ((N + 1)*(N + 2)*(N + 3))/6;
+	int **combi;
+	npy_intp dims[2] = {3*R, 3*R};
+	PyObject *E_array = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+	if (E_array == NULL)
+	{
+		PyErr_SetString(PyExc_MemoryError, "Memory for E matrix could not be allocated");
+		return NULL;
+	}
+	double *E_data = (double *)PyArray_DATA((PyArrayObject *)E_array);
+	combi = generate_combinations(N);
+	
+	if (combi == NULL) {
+        PyErr_SetString(PyExc_MemoryError, "Combinations array memory could not be allocated");
+        Py_DECREF(E_array); 
+        return NULL;
+    }
+	
+	for (int i = 0; i < 3; i++)
+	{
+		for (int k = 0; k < 3; k++)
+		{
+			for (int lm = 0; lm < R; lm++)
+			{
+				for (int lf = 0; lf < R; lf++)
+				{
+					int exp_index1[3];
+					int exp_index2[3];
+					for (int ind = 0; ind < 3; ind++)
+					{
+						exp_index1[ind] = combi[lm][ind];
+						exp_index2[ind] = combi[lf][ind]; 
+					}
+					E_data[3*R*(i*R +lm) + (k*R + lf)] = generate_E_matrix_element(i, k, exp_index1, exp_index2, options);
+				}
+			}
+		} 
+	}
+	free_combinations(combi, R);
+	return E_array;
+
+}
+
 PyObject *generate_element_in_gamma_matrix_py(PyObject *self, PyObject *args)
 {
 	PyArrayObject *exp_index1, *exp_index2, *C, *geo_par;
@@ -190,62 +348,12 @@ PyObject *generate_element_in_E_matrix_py(PyObject *self, PyObject *args)
 	return PyFloat_FromDouble(result);
 }	
 
-/*
-··································································································
-······················· AHORA SI CREEMOS UNA FUNCIÓN QUE DEVUELVA UN ARRAY ·······················
-··································································································
-*/
-
-PyObject *funcion1(PyObject *self, PyObject *args)
-{
-	/* Esta si deberitas va a devolver un array */
-	PyArrayObject *arr;
-	PyArg_ParseTuple(args, "O", &arr); // "O" de object, de python. 
-	if (PyErr_Occurred())
-	{
-		return NULL;
-	} 
-
-	if (!PyArray_Check(arr))// || PyArray_TYPE(arr) != NPY_DOUBLE || !PyArray_IS_C_CONTIGUOUS(arr))
-	{
-		PyErr_SetString(PyExc_TypeError, "Debe colocar un np.array c-contiguo con dtype de double como argumento");
-		return NULL;
-	}
-
-	int64_t size = PyArray_SIZE(arr); //equivalente a len(arr)
-	double *datos;
-	// Las siguientes líneas guardan los elementos del array de python en "datos"
-	int nd = 1; //número de dimensiones (del array supongo)
-	npy_intp dims[] = { [0] = size };
-	PyArray_AsCArray((PyObject **)&arr, &datos, dims, nd, PyArray_DescrFromType(NPY_DOUBLE));
-	//double *datos = PyArray_DATA(arr);
-	if (PyErr_Occurred())
-	{
-		//El dueño del video dice que hay otro concepto importante por aprender que es
-		// "REFERENCE COUNTING" y que no está cubierto en el video
-		return NULL;
-	}
-
-	PyObject *resultado = PyArray_SimpleNew(nd, dims, NPY_DOUBLE);
-	if (PyErr_Occurred())
-	{
-		return NULL;
-	}
-	double *datos_resultado = PyArray_DATA((PyArrayObject *)resultado);
-	for (int i=0;i<size;i++)
-	{
-		datos_resultado[i] = 2 * datos[i];
-	}
-	PyArray_Free((PyObject *)arr, datos);
-	return resultado;	
-	
-}
-
 
 static PyMethodDef methods[] = {
 	{"generate_gamma_matrix_element", generate_element_in_gamma_matrix_py, METH_VARARGS, "This functions generates a term in teh sum of an element of gamma matrix"},
 	{"generate_E_matrix_element", generate_element_in_E_matrix_py, METH_VARARGS, "This function generates a matrix element of E"},
-	{"funcion_chimba", funcion1, METH_VARARGS, "La funcion que devuelve un array"},
+	{"gamma_matrix", gamma_matrix_py, METH_VARARGS, "This function computes the gamma matrix"},
+	{"E_matrix", E_matrix_py, METH_VARARGS, "This function computes the E matrix"},
 	{NULL, NULL, 0, NULL}
 };
 
