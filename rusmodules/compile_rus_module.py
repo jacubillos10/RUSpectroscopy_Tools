@@ -2,7 +2,7 @@ import numpy as np
 from numba import njit, types
 from numba.pycc import CC
 
-cc = CC('rus')
+cc = CC('rus_old')
 @njit("f8(i8)")
 @cc.export("fact2", "f8(i8)")
 def fact2(N):
@@ -192,7 +192,8 @@ def gamma_matrix(N, C, geo_par, options):
                 #fin for 
             #fin for 
         #fin for 
-    #fin for 
+    #fin for
+    print("Hello from numba")
     return gamma
 #fin función 
 

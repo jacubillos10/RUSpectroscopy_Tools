@@ -213,6 +213,7 @@ PyObject  *gamma_matrix_py(PyObject *self, PyObject *args)
 		 } 
 	 }
 	 free_combinations(combi, R);
+	 printf("Hello from C \n");
 	 return gamma_array;
 
 }
@@ -357,17 +358,17 @@ static PyMethodDef methods[] = {
 	{NULL, NULL, 0, NULL}
 };
 
-static struct PyModuleDef rus_test_module = {
+static struct PyModuleDef rus_module = {
 	PyModuleDef_HEAD_INIT,
-	"rus_test",
+	"rus",
 	"Prototipo de modelo de rus.",
 	-1,
 	methods
 };
 
-PyMODINIT_FUNC PyInit_rus_test()
+PyMODINIT_FUNC PyInit_rus()
 { 
-	PyObject *module = PyModule_Create(&rus_test_module);
+	PyObject *module = PyModule_Create(&rus_module);
 	import_array();
 	return module;
 }
