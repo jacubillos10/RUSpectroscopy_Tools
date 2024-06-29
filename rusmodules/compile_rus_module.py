@@ -3,15 +3,19 @@ from numba import njit, types
 from numba.pycc import CC
 
 cc = CC('rus')
-@njit("i8(i8)")
-@cc.export("fact2", "i8(i8)")
+@njit("f8(i8)")
+@cc.export("fact2", "f8(i8)")
 def fact2(N):
     if N < -1:
         raise ArithmeticError("Está entrando en el doble factorial un númerno menor a -1")
     elif (N == 0 or N == -1 or N == 1):
         return 1
     else:
-        return N * fact2(N-2)
+        prod = 1.0
+        for i in range(N,1,-2):
+            prod = prod*i
+        #fin for 
+        return prod
     #fin if
 #fin función
 
@@ -128,7 +132,11 @@ def generate_matrix_element_E(i1, i2, exp_index1, exp_index2, options):
             R = (fact2(coeff[0] - 2)*fact2(coeff[1] - 2)*fact2(coeff[2] - 2))/(fact2(sum(coeff)))
         else:
             R = 1/(coeff[0]*coeff[1]*coeff[2])
-        #fin if 
+        #fin if
+        #print("Numba coeff: ", coeff, " fact 0: ", fact2(coeff[0]), " fact 1: ", fact2(coeff[1]), " fact 2: ", fact2(coeff[2]))
+        #print("Operacion 1 numba: ", (fact2(coeff[0] - 2)*fact2(coeff[1] - 2)))
+        #print("Operacion 2 numba: ", (fact2(coeff[0] + coeff[1])*coeff[2]))
+        #print("numba's 35!!= ", fact2(35))
         return Q*R
     #fin if
 #fin funcion

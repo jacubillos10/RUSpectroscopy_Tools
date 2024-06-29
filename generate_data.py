@@ -8,14 +8,18 @@ np.set_printoptions(suppress = True)
 C_ranks = (0.3, 5.6)
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
+Density = (2.0, 10,0)
 
-def generate_eigenvalues(Dimensions, C_rank, Crystal_structure, Shape, N_frequencies, Ng, Verbose = False):
+def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, N_frequencies, Ng, Verbose = False):
+    alpha = (1, np.pi/4, np.pi/6)
     dims = np.random.uniform(Dimensions["Min"], Dimensions["Max"])
     C = data_generator.generate_C_matrix(C_rank[0], C_rank[1], Crystal_structure)
+    rho = np.random.uniform(Density[0], Density[1])
     gamma = rus.gamma_matrix(Ng, C, dims, Shape)
     E = rus.E_matrix(Ng, Shape)
     N_freq = N_frequencies
-    vals, vects = scipy.linalg.eigh(a = gamma, b = E)
+    m = rho * alpha[Shape]*np.prod(dims)
+    vals, vects = scipy.linalg.eigh(a =(m**(-1/3)) * gamma, b = E)
     norma_gamma = np.linalg.norm(gamma - gamma.T)
     norma_E = np.linalg.norm(E - E.T)
     tol = 1e-7
@@ -48,6 +52,7 @@ input_data = {
                     "Max": dim_max
                 },
                 "C_rank": C_ranks,
+                "Density": Density,
                 "Crystal_structure": 0,
                 "Shape": 0,
                 "Verbose": False,

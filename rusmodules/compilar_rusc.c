@@ -5,16 +5,22 @@
 #include </home/cubos/.local/lib/python3.12/site-packages/numpy/core/include/numpy/arrayobject.h>
 #include <math.h>
 
-int fact2(int N)
+double fact2(int N)
 {
 	if (N < -1)
 	{
 		printf("Arithmetic Error: Cannot get double factorial of an input less than -1\n");
 		exit(EXIT_FAILURE);
 	} else if ( N == 0 || N == -1 || N == 1){
-		return 1;
+		return 1.0;
 	} else {
-		return N * fact2(N-2);
+		double prod = 1.0;
+		for (int i = N; i > 1; i-=2)
+		{
+			prod = prod * i;
+			//printf("i: %i, prod: %li\n", i, prod);
+		}
+		return prod;
 	}
 }
 
@@ -60,28 +66,60 @@ double generate_term_in_gamma_matrix_element(int exp_index1[3], int exp_index2[3
 	return P*Q*S*R;
 }
 
-
-PyObject *fact_2(PyObject *self, PyObject *args)
+double generate_gamma_matrix_element(int i1, int i2, int exp_index1[3], int exp_index2[3], double C[6][6], double geo_par[3], int options)
 {
-	// OK :) Esta function ya sirve. 
-	int x, resp;
-	// Aquí guarda los argumentos "dados" en variables de C 
-	PyArg_ParseTuple(args, "i", &x);
-	resp = fact2(x);
-	return PyLong_FromLong(resp);
-	/*return  PyLong_FromLong(x + y);*/
+	double suma = 0.0;
+	for (int j = 0; j < 3; j++)
+	{
+		for (int l = 0; l < 3; l++)
+		{
+			suma += generate_term_in_gamma_matrix_element(exp_index1, exp_index2, i1, i2, j, l, C, geo_par, options);
+		}
+	}
+	return suma;
 }
 
-PyObject *generate_term_in_gamma_matrix_element_py(PyObject *self, PyObject *args)
+double generate_E_matrix_element(int i1, int i2, int exp_index1[3], int exp_index2[3], int options)
+{
+	if (i1 != i2)
+	{
+		return 0.0;
+	} else {
+		int coeff[3], Q;
+		double R;
+		for (int i = 0; i < 3; i++) {coeff[i] = exp_index1[i] + exp_index2[i] + 1;} 
+		Q = (1 - (int)pow(-1,coeff[0]))*(1 - (int)pow(-1,coeff[1]))*(1 - (int)pow(-1,coeff[2]));
+		if (Q == 0)
+		{
+			return 0.0;
+		}
+		if (options == 1)
+		{
+			R = (0.0+fact2(coeff[0] - 2)*fact2(coeff[1] - 2))/(fact2(coeff[0] + coeff[1])*coeff[2]);
+		} else if (options == 2) {
+			R = (0.0+fact2(coeff[0] - 2)*fact2(coeff[1] - 2)*fact2(coeff[2] - 2))/(0.0+fact2(coeff[0] + coeff[1] + coeff[2]));
+		} else {
+			R = 1.0/(coeff[0]*coeff[1]*coeff[2]);
+		}	
+		//for (int i = 0; i < 3; i++) {printf("coeff %i: %i, fact: %li \n", i, coeff[i], fact2(coeff[i]));}	
+		//printf("Operacion 1: %li\n", (fact2(coeff[0] - 2)*fact2(coeff[1] - 2)));
+		//printf("Operacion 2: %li\n", fact2(coeff[0] + coeff[1])*coeff[2]);
+		//printf("35!!= %f\n", fact2(35));
+		return Q*R;
+	}
+}
+
+PyObject *generate_element_in_gamma_matrix_py(PyObject *self, PyObject *args)
 {
 	PyArrayObject *exp_index1, *exp_index2, *C, *geo_par;
-    int i1, i2, j1, j2, options;
+    int i1, i2, options;
 	double result;
 
-	if (!PyArg_ParseTuple(args, "O!O!iiiiO!O!i",
+
+	if (!PyArg_ParseTuple(args, "iiO!O!O!O!i",
+				&i1, &i2,
 				&PyArray_Type, &exp_index1,
 				&PyArray_Type, &exp_index2,
-				&i1, &i2, &j1, &j2,
 				&PyArray_Type, &C,
 				&PyArray_Type, &geo_par,
 				&options))
@@ -113,13 +151,44 @@ PyObject *generate_term_in_gamma_matrix_element_py(PyObject *self, PyObject *arg
     }
 	//for (int i = 0; i < 3; i++) {printf("|%i|%i|\n", exp_index1_data[i], exp_index2_data[i]);}
     // Call the C function
-    result = generate_term_in_gamma_matrix_element(exp_index1_data, exp_index2_data,
-                                                   i1, i2, j1, j2, C_data,
+    result = generate_gamma_matrix_element(i1, i2, exp_index1_data, exp_index2_data,
+                                                   C_data,
                                                    geo_par_data, options);
 
     // Return the result as a Python float
     return PyFloat_FromDouble(result);
 }
+
+PyObject *generate_element_in_E_matrix_py(PyObject *self, PyObject *args)
+{
+	PyArrayObject *exp_index1, *exp_index2;
+	int i1, i2, options;
+	double result;
+	if (!PyArg_ParseTuple(args, "iiO!O!i",
+				&i1, &i2,
+				&PyArray_Type, &exp_index1,
+				&PyArray_Type, &exp_index2,
+				&options))
+	{
+		return NULL;
+	}
+	if (!PyArray_Check(exp_index1) || !PyArray_Check(exp_index2))
+	{
+		PyErr_SetString(PyExc_TypeError, "Expected numpy arrays for exp_index1 and exp_index2");
+		return NULL;
+	}
+
+	int *exp_index1_data = (int *)PyArray_DATA(exp_index1);
+	int *exp_index2_data = (int *)PyArray_DATA(exp_index2);
+	if (PyArray_NDIM(exp_index1) != 1 || PyArray_DIM(exp_index1, 0) != 3 ||
+			PyArray_NDIM(exp_index2) != 1 || PyArray_DIM(exp_index2, 0) != 3)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid dimensions for exp_index1 or exp_index2. Must be (3,)");
+		return NULL;
+	}
+	result = generate_E_matrix_element(i1, i2, exp_index1_data, exp_index2_data, options);
+	return PyFloat_FromDouble(result);
+}	
 
 /*
 ··································································································
@@ -174,8 +243,8 @@ PyObject *funcion1(PyObject *self, PyObject *args)
 
 
 static PyMethodDef methods[] = {
-	{"fact2", fact_2, METH_VARARGS, "This functions computes the double factorial of a given integer"},
-	{"generate_term_in_gamma_matrix_element", generate_term_in_gamma_matrix_element_py, METH_VARARGS, "This functions generates a term in teh sum of an element of gamma matrix"},
+	{"generate_gamma_matrix_element", generate_element_in_gamma_matrix_py, METH_VARARGS, "This functions generates a term in teh sum of an element of gamma matrix"},
+	{"generate_E_matrix_element", generate_element_in_E_matrix_py, METH_VARARGS, "This function generates a matrix element of E"},
 	{"funcion_chimba", funcion1, METH_VARARGS, "La funcion que devuelve un array"},
 	{NULL, NULL, 0, NULL}
 };

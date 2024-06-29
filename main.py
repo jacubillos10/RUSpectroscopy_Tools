@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import time
 
 np.set_printoptions(suppress = True)
-shape = 0 # 0: parallelepiped, 1: cilinder, 2: ellipsoid 
+shape = 1 # 0: parallelepiped, 1: cilinder, 2: ellipsoid 
 """
 #Datos del FeGa
 Ng = 12
@@ -23,7 +23,7 @@ nombre_archivo = 'constantesSmB6.csv' #Mbar
 A = 1
 #Datos del URu2Si2
 Ng = 14
-m = (A**3)*0.2634 #g 9.84029 #9.839 #g/cm^3 
+m = (A**3)*0.20688 #g 9.84029 #9.839 #g/cm^3 
 nombre_archivo = 'constantesURu2Si2.csv' #Mbar
 
 
