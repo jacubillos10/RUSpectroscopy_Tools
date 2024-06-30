@@ -4,6 +4,7 @@
 #include </usr/include/python3.12/Python.h>
 #include </home/cubos/.local/lib/python3.12/site-packages/numpy/core/include/numpy/arrayobject.h>
 #include <math.h>
+#include <omp.h>
 
 double fact2(int N)
 {
@@ -191,7 +192,7 @@ PyObject  *gamma_matrix_py(PyObject *self, PyObject *args)
 		 Py_DECREF(gamma_array); // Free gamma_array if combi allocation fails
 		 return NULL;
      }			
-
+	 #pragma omp parallel for collapse(4)
 	 for (int i = 0; i < 3; i++)
 	 {
 		 for (int k = 0; k < 3; k++)
@@ -200,20 +201,13 @@ PyObject  *gamma_matrix_py(PyObject *self, PyObject *args)
 			 {
 				 for (int lf = 0; lf < R; lf++)
 				 {
-					 int exp_index1[3];
-					 int exp_index2[3];
-					 for (int ind = 0; ind < 3; ind++)
-					 {
-						 exp_index1[ind] = combi[lm][ind];
-						 exp_index2[ind] = combi[lf][ind]; 
-					 }
-					 gamma_data[3*R*(i*R +lm) + (k*R + lf)] = generate_gamma_matrix_element(i, k, exp_index1, exp_index2, C_data, geo_par_data, options);
+					 gamma_data[3*R*(i*R +lm) + (k*R + lf)] = generate_gamma_matrix_element(i, k, combi[lm], combi[lf], C_data, geo_par_data, options);
 				 }
 			 }
 		 } 
 	 }
 	 free_combinations(combi, R);
-	 printf("Hello from C \n");
+	 //printf("Hello from C \n");
 	 return gamma_array;
 
 }
@@ -242,7 +236,7 @@ PyObject *E_matrix_py(PyObject *self, PyObject *args)
         Py_DECREF(E_array); 
         return NULL;
     }
-	
+	#pragma omp parallel for collapse(4)	
 	for (int i = 0; i < 3; i++)
 	{
 		for (int k = 0; k < 3; k++)
@@ -251,14 +245,7 @@ PyObject *E_matrix_py(PyObject *self, PyObject *args)
 			{
 				for (int lf = 0; lf < R; lf++)
 				{
-					int exp_index1[3];
-					int exp_index2[3];
-					for (int ind = 0; ind < 3; ind++)
-					{
-						exp_index1[ind] = combi[lm][ind];
-						exp_index2[ind] = combi[lf][ind]; 
-					}
-					E_data[3*R*(i*R +lm) + (k*R + lf)] = generate_E_matrix_element(i, k, exp_index1, exp_index2, options);
+					E_data[3*R*(i*R +lm) + (k*R + lf)] = generate_E_matrix_element(i, k, combi[lm], combi[lf], options);
 				}
 			}
 		} 
