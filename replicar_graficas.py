@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import time
 
 np.set_printoptions(suppress = True)
-shape = 2 # 0: parallelepiped, 1: cilinder, 2: ellipsoid 
+shape = 1 # 0: parallelepiped, 1: cilinder, 2: ellipsoid 
 alphas = (1, np.pi/4, np.pi/6)
 alpha = alphas[shape]
 Finura = 500
@@ -15,9 +15,9 @@ A = 2
 #Datos del URu2Si2
 Ng = 8
 rho = 1
-C_const = np.array([[2.0, 1.0, 1.0, 0.0, 0.0, 0.0],
-                    [1.0, 2.0, 1.0, 0.0, 0.0, 0.0],
-                    [1.0, 1.0, 2.0, 0.0, 0.0, 0.0],
+C_const = np.array([[3.0, 1.0, 1.0, 0.0, 0.0, 0.0],
+                    [1.0, 3.0, 1.0, 0.0, 0.0, 0.0],
+                    [1.0, 1.0, 3.0, 0.0, 0.0, 0.0],
                     [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
                     [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
                     [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
@@ -32,7 +32,7 @@ bx = np.r_[bx_izq, bx_der]
 bz = np.r_[bz_izq, bz_der]
 vol = alpha*(bx**2)*bz
 b = np.c_[bx,bx,bz]
-#filas = 10
+#filas = 36
 filas = int((1/2) * (Ng + 1) * (Ng + 2) * (Ng+ 3) - 6)
 freqs = np.zeros((filas, Finura))
 for i in range(Finura):
