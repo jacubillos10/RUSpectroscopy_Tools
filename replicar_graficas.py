@@ -39,12 +39,12 @@ for i in range(Finura):
     m = (A**3)*rho*vol[i]
     gamma = rus.gamma_matrix(Ng, C_const, b[i,:], shape)
     E = rus.E_matrix(Ng, shape)
-    vals, vects = scipy.linalg.eigh(a = (m**(-1/3))*gamma, b = E)
+    vals, vects = scipy.linalg.eigh(a = (vol[i]**(-1/3))*gamma, b = E)
     print("***Iteración número ", i)
     #print("Norma: ", np.linalg.norm(gamma - gamma.T))
     #print("Norma: ", np.linalg.norm(E - E.T))
     #print(vals[:7])
-    freq = ((vals[6:]/(2*np.pi))/(m**(2/3)))**0.5
+    freq = (vals[6:]*(vol[i]**(1/3))/(m*2*np.pi))**0.5
     freqs[:,i] = freq[:filas]
 #fin for
 

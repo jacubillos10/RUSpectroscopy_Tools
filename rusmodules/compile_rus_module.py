@@ -193,7 +193,7 @@ def gamma_matrix(N, C, geo_par, options):
             #fin for 
         #fin for 
     #fin for
-    print("Hello from numba")
+    #print("Hello from numba")
     return gamma
 #fin función 
 
