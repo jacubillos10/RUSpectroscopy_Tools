@@ -8,18 +8,35 @@ np.set_printoptions(suppress = True)
 C_ranks = (0.3, 5.6)
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
-Density = (2.0, 10,0)
+Density = (2.0, 10)
+nombre_archivo = "datos.csv"
+write_header = False
 
-def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, N_frequencies, Ng, Verbose = False):
+input_data = { 
+                "Dimensions": 
+                {
+                    "Min": dim_min,
+                    "Max": dim_max
+                },
+                "C_rank": C_ranks,
+                "Density": Density,
+                "Crystal_structure": 0,
+                "Shape": 0,
+                "Verbose": False,
+                "N_freq": 24,
+                "Ng": 14
+              }
+
+def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, N_freq, Ng, Verbose = False):
     alpha = (1, np.pi/4, np.pi/6)
     dims = np.random.uniform(Dimensions["Min"], Dimensions["Max"])
+    vol = alpha[Shape]*np.prod(dims)
+    dims_adim = dims/(vol**(1/3))
     C = data_generator.generate_C_matrix(C_rank[0], C_rank[1], Crystal_structure)
     rho = np.random.uniform(Density[0], Density[1])
-    gamma = rus.gamma_matrix(Ng, C, dims, Shape)
+    gamma = rus.gamma_matrix(Ng, C, dims_adim, Shape)
     E = rus.E_matrix(Ng, Shape)
-    N_freq = N_frequencies
-    m = rho * alpha[Shape]*np.prod(dims)
-    vals, vects = scipy.linalg.eigh(a =(m**(-1/3)) * gamma, b = E)
+    vals, vects = scipy.linalg.eigh(a = gamma, b = E)
     norma_gamma = np.linalg.norm(gamma - gamma.T)
     norma_E = np.linalg.norm(E - E.T)
     tol = 1e-7
@@ -42,24 +59,31 @@ def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, 
         N_freq = len(vals)
     #fin if 
     C_reshaped = np.r_[*(C[i,i:] for i in range(6))]
-    return np.r_[dims, C_reshaped, vals[6:N_freq]]
+    eigenvals = vals[6:N_freq+6]
+    freqs_2 = eigenvals/(rho * vol**(2/3))
+    return np.array([np.r_[rho, dims, dims_adim, C_reshaped, eigenvals, freqs_2]])
 #fin funcion
 
-input_data = { 
-                "Dimensions": 
-                {
-                    "Min": dim_min,
-                    "Max": dim_max
-                },
-                "C_rank": C_ranks,
-                "Density": Density,
-                "Crystal_structure": 0,
-                "Shape": 0,
-                "Verbose": False,
-                "N_frequencies": 24,
-                "Ng": 14
-              }
+def generate_keys(N_vals):
+    keys_ini = ["Density", "Lx", "Ly", "Lz", "lx", "ly", "lz"]
+    keys_C = sum(map(lambda x: list(map(lambda y: "C" + str(x) + str(y) , range(x,6))), range(6)), [])
+    keys_eigenvals = list(map(lambda x: "eig_" + str(x), range(N_vals)))
+    keys_freq = list(map(lambda x: "(omega^2)_" + str(x), range(N_vals)))
+    return keys_ini + keys_C + keys_eigenvals + keys_freq
 
+keys = generate_keys(input_data["N_freq"])
+keys_str = ",".join(keys)
 
-sample1 = generate_eigenvalues(**input_data)
-print(sample1)
+if write_header:
+    with open(nombre_archivo, "w+t") as f:
+        datos = generate_eigenvalues(**input_data)
+        print(len(keys), len(datos[0]))
+        np.savetxt(f, datos, header = keys_str, delimiter = ",")
+else:
+    with open(nombre_archivo, "a+t") as f:
+        while True:
+            datos = generate_eigenvalues(**input_data)
+            #print(len(keys), len(datos[0]))
+            np.savetxt(f, datos, delimiter = ",")
+#fin if
+
