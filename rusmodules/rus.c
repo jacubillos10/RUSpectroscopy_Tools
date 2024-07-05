@@ -1,8 +1,8 @@
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <stdio.h>
 #include <stdlib.h>
-#include </usr/include/python3.12/Python.h>
-#include </home/cubos/.local/lib/python3.12/site-packages/numpy/core/include/numpy/arrayobject.h>
+#include <Python.h>
+#include <numpy/arrayobject.h>
 #include <math.h>
 #include <omp.h>
 
