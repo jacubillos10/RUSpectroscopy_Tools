@@ -28,7 +28,7 @@ A = 2
 Ng = 14
 m = 0.2634 #g 9.84029 #9.839 #g/cm^3 
 m_p = (A**3) * m
-nombre_archivo = 'constantesURu2Si2.csv' #Mbar
+nombre_archivo = 'constant_data/constantesURu2Si2.csv' #Mbar
 
 
 C_const = np.genfromtxt(nombre_archivo, delimiter=',', skip_header=0, dtype=float)
@@ -64,7 +64,7 @@ print(vals[6:6+12])
 print(vals_p[6:6+12])
 eigenvalue_index = np.array(range(len(vals[6:])))
 
-
+"""
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
 ax1.plot(eigenvalue_index, freq_vueltas, eigenvalue_index, freq_vueltas_p)
@@ -72,3 +72,4 @@ ax1.set_xlabel("Indice del valor propio")
 ax1.set_ylabel("Frecuencia en Hz")
 ax1.legend(["A = 1", "A = 2"])
 plt.show()
+"""
