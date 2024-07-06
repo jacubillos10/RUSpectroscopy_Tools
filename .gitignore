@@ -13,4 +13,6 @@
 *.bbl
 *.blg
 *.swp
-*build/*
+build/*
+ruspectroscopy_tools.egg-info/*
+dist/*
