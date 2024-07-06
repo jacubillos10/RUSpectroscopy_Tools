@@ -35,4 +35,4 @@ frequencies = omega/(2*np.pi)
 
 ## Installation: 
 ```bash
-pip3 install ruspectroscopy_tools
+pip3 install ruspectroscopy-tools
