@@ -49,7 +49,9 @@ print("Norma: ", np.linalg.norm(E - E.T))
 freq = (vals[6:]*(vol**(1/3))/m)**0.5
 freq_vueltas = freq*(1/(2*np.pi))
 #np.savetxt(nombre_archivo[:-4] + '_freq_' + str(shape) +'.csv', np.c_[range(len(vals)), freq, freq_vueltas], delimiter = ',')
-
+print(vals[6:6+12])
+print(freq_vueltas[:12])
+"""
 gamma_p = rus.gamma_matrix(Ng, C_const, geometry_p, shape)
 E_p = rus.E_matrix(Ng, shape)
 
@@ -63,7 +65,7 @@ print(freq_vueltas_p[:12])
 print(vals[6:6+12])
 print(vals_p[6:6+12])
 eigenvalue_index = np.array(range(len(vals[6:])))
-
+"""
 """
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
@@ -73,3 +75,4 @@ ax1.set_ylabel("Frecuencia en Hz")
 ax1.legend(["A = 1", "A = 2"])
 plt.show()
 """
+

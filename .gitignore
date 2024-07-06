@@ -13,3 +13,4 @@
 *.bbl
 *.blg
 *.swp
+*build/*
