@@ -9,7 +9,6 @@ C_ranks = (0.3, 5.6)
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 Density = (2.0, 10)
-nombre_archivo = "datos.csv"
 write_header = False
 
 input_data = { 
@@ -26,6 +25,8 @@ input_data = {
                 "N_freq": 24,
                 "Ng": 14
               }
+nombre_archivo = "output_data/datos_CS" + str(input_data["Crystal_structure"]) + "_S" + str(input_data["Shape"])+ "_.csv"
+nombre_archivo_adim = "output_data/datos_A_CS" + str(input_data["Crystal_structure"]) + "_S" + str(input_data["Shape"])+ "_.csv" 
 
 def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, N_freq, Ng, Verbose = False):
     alpha = (1, np.pi/4, np.pi/6)
@@ -61,29 +62,38 @@ def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, 
     C_reshaped = np.r_[*(C[i,i:] for i in range(6))]
     eigenvals = vals[6:N_freq+6]
     freqs_2 = eigenvals/(rho * vol**(2/3))
-    return np.array([np.r_[rho, dims, dims_adim, C_reshaped, eigenvals, freqs_2]])
+    return [np.array([np.r_[Shape, Crystal_structure, dims_adim, C_reshaped, eigenvals]]),
+            np.array([np.r_[Shape, Crystal_structure, rho, dims, C_reshaped, freqs_2]])]
 #fin funcion
 
 def generate_keys(N_vals):
-    keys_ini = ["Density", "Lx", "Ly", "Lz", "lx", "ly", "lz"]
+    keys_ini = ["Shape", "Cry_st", "Density", "Lx", "Ly", "Lz"]
+    keys_ini_adim = ["Shape", "Cry_st", "bx", "by", "bz"]
     keys_C = sum(map(lambda x: list(map(lambda y: "C" + str(x) + str(y) , range(x,6))), range(6)), [])
     keys_eigenvals = list(map(lambda x: "eig_" + str(x), range(N_vals)))
     keys_freq = list(map(lambda x: "(omega^2)_" + str(x), range(N_vals)))
-    return keys_ini + keys_C + keys_eigenvals + keys_freq
+    return [keys_ini_adim + keys_C + keys_eigenvals,
+            keys_ini + keys_C + keys_freq]
+#fin función
 
 keys = generate_keys(input_data["N_freq"])
-keys_str = ",".join(keys)
+keys_adim = ",".join(keys[0])
+keys_str = ",".join(keys[1])
 
 if write_header:
+    datos = generate_eigenvalues(**input_data)
     with open(nombre_archivo, "w+t") as f:
-        datos = generate_eigenvalues(**input_data)
-        print(len(keys), len(datos[0]))
-        np.savetxt(f, datos, header = keys_str, delimiter = ",")
+        print(len(keys[1]), len(datos[1][0]))
+        np.savetxt(f, datos[1], header = keys_str, delimiter = ",")
+    with open(nombre_archivo_adim, "w+t") as f:
+        print(len(keys[0]), len(datos[0][0]))
+        np.savetxt(f, datos[0], header = keys_adim, delimiter = ",")
 else:
-    with open(nombre_archivo, "a+t") as f:
-        while True:
-            datos = generate_eigenvalues(**input_data)
-            #print(len(keys), len(datos[0]))
-            np.savetxt(f, datos, delimiter = ",")
+    while True:
+        datos = generate_eigenvalues(**input_data)
+        with open(nombre_archivo, "a+t") as f:
+            np.savetxt(f, datos[1], delimiter = ",")
+        with open(nombre_archivo_adim, "a+t") as f:
+            np.savetxt(f, datos[0], delimiter = ",")
 #fin if
 
