@@ -6,6 +6,12 @@
 #include <math.h>
 #include <omp.h>
 
+/*!******************************************************************************
+ * @brief This function returns the double factorial of a given integer
+ * This function return the double factorial of a given integer. Warning: returns a float
+ * @param N <int> The integer which double factorial will be calculated
+ * @return prod <double> The double factorial of N
+ *********************************************************************************/
 double fact2(int N)
 {
 	if (N < -1)
@@ -19,12 +25,20 @@ double fact2(int N)
 		for (int i = N; i > 1; i-=2)
 		{
 			prod = prod * i;
-			//printf("i: %i, prod: %li\n", i, prod);
+			//printf("idd: %i, prod: %li\n", i, prod);
 		}
 		return prod;
 	}
 }
-
+/*!******************************************************************************
+ * @brief This function changes from 4 index notation to Voigt notation. 
+ * The function return an interer depending on the input of the two integers this vay:
+ * [0 0] -> 0, [1 1]-> 1, [2 2] -> 2, [1 2] or [2 1] -> 3, [0 2] or [2 0] -> 4, 
+ * [0 1] or [1 0] -> 5.
+ * @param i <int> First Index
+ * @param i <int> Second Index
+ * @return index <int> New index transformed into Voigt notation 
+ *******************************************************************************/
 int it_c(int i, int j)
 {
 	int index;
@@ -33,6 +47,20 @@ int it_c(int i, int j)
 	return index;
 }
 
+/*!******************************************************************************
+ * @brief This function returns one term if the sum composing one element in gamma matrix
+ * This function returns a term in the equation 20 of the document Plantilla_PropuestaTdG2015.tex (and the multiplied with the volume)
+ * @param exp_index1 <int[3]> First set of exponents of the basis functions (lambda1, mu1, nu1)
+ * @param exp_index2 <int[3]> Second set of exponents of the basis functions (lambda2, mu2, nu2)
+ * @param i1 <int> Integer equivalent of the i index of equation 20
+ * @param i2 <int> Integer equivalent of the k index of equation 20
+ * @param j1 <int> Integer equivalent of the j index of equation 20
+ * @param j2 <int> Integer equivalent of the l index of equation 20
+ * @param C <double[6][6]> Matrix of elastic constants
+ * @param geo_poar <double[3]> Array which contains the dimensions of the sample in cm 
+ * @param options <int> Shape of the sample. 0 for parallelepiped, 1 for cylinder, 2 for ellipsoid
+ * @return  <double> A float that represents a term in the sum of a element of gamma matrix 
+ *******************************************************************************/
 double generate_term_in_gamma_matrix_element(int exp_index1[3], int exp_index2[3], int i1, int i2, int j1, int j2, double C[6][6], double geo_par[3], int options)
 {
 	int coeff[3], Q, S;
@@ -66,7 +94,18 @@ double generate_term_in_gamma_matrix_element(int exp_index1[3], int exp_index2[3
 	//for (int i = 0; i < 3; i++) {printf("%f, %i, %i\n", geo_par[i], exp_index1[i], exp_index2[i]); }
 	return P*Q*S*R;
 }
-
+/*!******************************************************************************
+ * @brief This function returns one element in gamma matrix
+ * This function returns the full sum of  equation 20 of the document Plantilla_PropuestaTdG2015.tex (and then multiplied with the volume)
+ * @param i1 <int> Integer equivalent of the i index of equation 20
+ * @param i2 <int> Integer equivalent of the k index of equation 20
+ * @param exp_index1 <int[3]> First set of exponents of the basis functions (lambda1, mu1, nu1)
+ * @param exp_index2 <int[3]> Second set of exponents of the basis functions (lambda2, mu2, nu2)
+ * @param C <double[6][6]> Matrix of elastic constants
+ * @param geo_par <double[3]> Array which contains the dimensions of the sample in cm 
+ * @param options <int> Shape of the sample. 0 for parallelepiped, 1 for cylinder, 2 for ellipsoid
+ * @return <double> A float representing an element of gamma matrix 
+ *******************************************************************************/
 double generate_gamma_matrix_element(int i1, int i2, int exp_index1[3], int exp_index2[3], double C[6][6], double geo_par[3], int options)
 {
 	double suma = 0.0;
@@ -79,7 +118,16 @@ double generate_gamma_matrix_element(int i1, int i2, int exp_index1[3], int exp_
 	}
 	return suma;
 }
-
+/*!******************************************************************************
+ * @brief This function returns one element in E matrix
+ * This function returns the equation 19 of the document Plantilla_PropuestaTdG2015.tex 
+ * @param i1 <int> Integer equivalent of the i index of equation 19
+ * @param i2 <int> Integer equivalent of the k index of equation 19
+ * @param exp_index1 <int[3]> First set of exponents of the basis functions (lambda1, mu1, nu1)
+ * @param exp_index2 <int[3]> Second set of exponents of the basis functions (lambda2, mu2, nu2)
+ * @param options <int> Shape of the sample. 0 for parallelepiped, 1 for cylinder, 2 for ellipsoid
+ * @return <double> A float representing an element of E matrix 
+ *******************************************************************************/
 double generate_E_matrix_element(int i1, int i2, int exp_index1[3], int exp_index2[3], int options)
 {
 	if (i1 != i2)
@@ -109,12 +157,15 @@ double generate_E_matrix_element(int i1, int i2, int exp_index1[3], int exp_inde
 		return Q*R;
 	}
 }
-
-// Function to generate combinations
+/*!******************************************************************************
+ * @brief This function return all posible combinations of three integers which sum N
+ * This function returns a memory addres which has stored other memory addreses where the 3D arrays of possible indexes summing N are stored
+ * @param N <int> Mentioned integer N
+ * @return <**int> Memory address where the memory addresses of the combinations are stored 
+ *******************************************************************************/
 int **generate_combinations(int N) {
     int R = ((N + 1) * (N + 2) * (N + 3))/6;
 
-    // Allocate memory for the combinations array
     int **combi = (int **)malloc(R * sizeof(int *));
     for (int i = 0; i < R; i++) 
 	{
@@ -136,8 +187,11 @@ int **generate_combinations(int N) {
     return combi;
 }
 
-
-// Function to free allocated memory
+/*!******************************************************************************
+ * @brief This function cleans the memory allocations created by generate_combinations() function
+ * @param combi <**int> Memory address where the combinations addresses are stored
+ * @param total_combinations <int> Totan possible combinations of threee integers which sum N, or total number of addesses.
+ *******************************************************************************/
 void free_combinations(int **combi, int total_combinations) {
     for (int i = 0; i < total_combinations; i++) {
         free(combi[i]);
@@ -145,6 +199,9 @@ void free_combinations(int **combi, int total_combinations) {
     free(combi);
 }
 
+/*!******************************************************************************
+ * @brief This function calculates each element in gamma matrix and exports it as a np.array() 
+ *******************************************************************************/
 PyObject  *gamma_matrix_py(PyObject *self, PyObject *args)
 {
 	PyArrayObject *C, *geo_par;
@@ -189,7 +246,7 @@ PyObject  *gamma_matrix_py(PyObject *self, PyObject *args)
 	 if (combi == NULL) 
 	 {
 		 PyErr_SetString(PyExc_MemoryError, "Combinations array memory could not be allocated");
-		 Py_DECREF(gamma_array); // Free gamma_array if combi allocation fails
+		 Py_DECREF(gamma_array); // Aquí se libera gamma_array en caso de que la asignación falle
 		 return NULL;
      }			
 	 #pragma omp parallel for collapse(4)
@@ -212,6 +269,9 @@ PyObject  *gamma_matrix_py(PyObject *self, PyObject *args)
 
 }
 
+/*!******************************************************************************
+ * @brief This function calculates each element in E matrix and exports it as a np.array() 
+ *******************************************************************************/
 PyObject *E_matrix_py(PyObject *self, PyObject *args)
 {
 	int N, options;
@@ -272,7 +332,7 @@ PyObject *generate_element_in_gamma_matrix_py(PyObject *self, PyObject *args)
 	{
 		return NULL;
 	}
-	// Validate input arrays
+
     if (!PyArray_Check(exp_index1) || !PyArray_Check(exp_index2) ||
         !PyArray_Check(C) || !PyArray_Check(geo_par))
     {
@@ -280,13 +340,11 @@ PyObject *generate_element_in_gamma_matrix_py(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    // Convert numpy arrays to C arrays
     int *exp_index1_data = (int *)PyArray_DATA(exp_index1);
     int *exp_index2_data = (int *)PyArray_DATA(exp_index2);
     double (*C_data)[6] = (double (*)[6])PyArray_DATA(C);
     double *geo_par_data = (double *)PyArray_DATA(geo_par);
 
-    // Ensure dimensions match expected sizes
     if (PyArray_NDIM(exp_index1) != 1 || PyArray_DIM(exp_index1, 0) != 3 ||
         PyArray_NDIM(exp_index2) != 1 || PyArray_DIM(exp_index2, 0) != 3 ||
         PyArray_NDIM(C) != 2 || PyArray_DIM(C, 0) != 6 || PyArray_DIM(C, 1) != 6 ||
@@ -296,12 +354,10 @@ PyObject *generate_element_in_gamma_matrix_py(PyObject *self, PyObject *args)
         return NULL;
     }
 	//for (int i = 0; i < 3; i++) {printf("|%i|%i|\n", exp_index1_data[i], exp_index2_data[i]);}
-    // Call the C function
     result = generate_gamma_matrix_element(i1, i2, exp_index1_data, exp_index2_data,
                                                    C_data,
                                                    geo_par_data, options);
 
-    // Return the result as a Python float
     return PyFloat_FromDouble(result);
 }
 
@@ -340,8 +396,8 @@ PyObject *generate_element_in_E_matrix_py(PyObject *self, PyObject *args)
 static PyMethodDef methods[] = {
 	{"generate_gamma_matrix_element", generate_element_in_gamma_matrix_py, METH_VARARGS, "This functions generates a term in teh sum of an element of gamma matrix"},
 	{"generate_E_matrix_element", generate_element_in_E_matrix_py, METH_VARARGS, "This function generates a matrix element of E"},
-	{"gamma_matrix", gamma_matrix_py, METH_VARARGS, "This function computes the gamma matrix"},
-	{"E_matrix", E_matrix_py, METH_VARARGS, "This function computes the E matrix"},
+	{"gamma_matrix", gamma_matrix_py, METH_VARARGS, "This function computes the gamma matrix.\n@Input N <int>: Maximum order of the exponents in the base functions.\n@Input C <np.array>: Matrix of elastic constants (6x6).\n@Input geo_par <np.array>: Array with the dimensions of the sample in cm.\n@Input options <int>: 0 for parallelepiped, 1 for cylinder, 2 for ellipsoid.\n@Return <np.array>: The gamma matrix.\n"},
+	{"E_matrix", E_matrix_py, METH_VARARGS, "This function computes the E matrix.\n@Input N <int>: Maximum order of the exponents in the base functions.\n@Input options <int>: 0 for parallelepiped, 1 for cylinder, 2 for ellipsoid.\n@Return <np.array>: The E matrix.\n"},
 	{NULL, NULL, 0, NULL}
 };
 
