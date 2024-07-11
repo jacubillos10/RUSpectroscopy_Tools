@@ -9,7 +9,7 @@ C_ranks = (0.3, 5.6)
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 Density = (2.0, 10)
-write_header = False
+write_header = True
 
 input_data = { 
                 "Dimensions": 
@@ -60,6 +60,7 @@ def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, 
         N_freq = len(vals)
     #fin if 
     C_reshaped = np.r_[*(C[i,i:] for i in range(6))]
+    print(C_reshaped)
     eigenvals = vals[6:N_freq+6]
     freqs_2 = eigenvals/(rho * vol**(2/3))
     return [np.array([np.r_[Shape, Crystal_structure, dims_adim, C_reshaped, eigenvals]]),
