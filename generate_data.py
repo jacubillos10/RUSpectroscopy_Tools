@@ -22,11 +22,11 @@ input_data = {
                 "Crystal_structure": 0,
                 "Shape": 0,
                 "Verbose": False,
-                "N_freq": 24,
+                "N_freq": 500,
                 "Ng": 14
               }
-nombre_archivo = "output_data/datos_CS" + str(input_data["Crystal_structure"]) + "_S" + str(input_data["Shape"])+ "_.csv"
-nombre_archivo_adim = "output_data/datos_A_CS" + str(input_data["Crystal_structure"]) + "_S" + str(input_data["Shape"])+ "_.csv" 
+nombre_archivo = "output_data/datos_antigua.csv"
+nombre_archivo_adim = "output_data/datos_nueva.csv" 
 
 def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, N_freq, Ng, Verbose = False):
     alpha = (1, np.pi/4, np.pi/6)
