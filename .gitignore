@@ -16,3 +16,4 @@
 build/*
 ruspectroscopy_tools.egg-info/*
 dist/*
+output_data/*.csv
