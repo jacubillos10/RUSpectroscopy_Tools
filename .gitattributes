@@ -4,3 +4,5 @@ replicate_plots.py linguist-documentation
 test_one_forward.py linguist-documentation
 generate_data.py linguist-documentation
 output_data/* linguist-documentation
+constant_data/* linguist-documentation
+LaTeX_Docs/* linguist-documentation
