@@ -25,8 +25,8 @@ input_data = {
                 "N_freq": 500,
                 "Ng": 14
               }
-nombre_archivo = "output_data/datos_antigua.csv"
-nombre_archivo_adim = "output_data/datos_nueva.csv" 
+nombre_archivo = "output_data/l_Gauss.csv"
+nombre_archivo_adim = "output_data/a_Gauss.csv" 
 
 def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, N_freq, Ng, Verbose = False):
     alpha = (1, np.pi/4, np.pi/6)
