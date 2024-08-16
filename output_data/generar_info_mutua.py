@@ -6,8 +6,8 @@ from sklearn.feature_selection import mutual_info_regression
 import pandas as pd
 
 # %%
-datos_antigua_full = pd.read_csv("l_Unif.csv", delimiter=",", on_bad_lines='skip')
-datos_nueva_full = pd.read_csv("a_Unif.csv", delimiter=",", on_bad_lines='skip')
+datos_antigua_full = pd.read_csv("l_Unif_30k.csv", delimiter=",", on_bad_lines='skip')
+datos_nueva_full = pd.read_csv("a_Unif_30k.csv", delimiter=",", on_bad_lines='skip')
 
 # %%
 #datos_antigua = datos_antigua_full.sample(n =100)
@@ -79,26 +79,34 @@ def info_mutua(N_freq_disp, Cobj, d_frame, opt = "Lineal"):
     X = d_frame[lista_X]
     y = d_frame[Cobj]
     resp = mutual_info_regression(X, y, discrete_features=tuple(range(N_col, N_col+7)))
-    return (resp, lista_X)
+    return dict(map(lambda p: (lista_X[p], resp[p]), range(len(lista_X))))
 #fin función
 
-# %%
+# %% 
 N_disp = 10
 options = "Lineal"
 targets = ["C00", "C11", "C22", "C33", "C44", "C55", "C01", "C02", "C12"]
-listas_antiguas = []
-listas_nuevas = []
-MI_antiguas = []
-MI_nuevas = []
+MI_antiguas = dict()
+MI_nuevas = dict()
 for i in range(len(targets)):
     target = targets[i]
     MI_antigua_info = info_mutua(N_disp, target, datos_antigua, options)
     MI_nueva_info = info_mutua(N_disp, target, datos_nueva, options)
-    MI_antiguas.append(MI_antigua_info[0])
-    MI_nuevas.append(MI_nueva_info[0])
-    listas_antiguas.append(MI_antigua_info[1])
-    listas_nuevas.append(MI_nueva_info[1])
+    MI_antiguas[target] =  MI_antigua_info
+    MI_nuevas[target] = MI_nueva_info
 #fin for 
+
+
+MI_antiguas = pd.DataFrame(MI_antiguas)
+MI_nuevas = pd.DataFrame(MI_nuevas)
+
+MI_antiguas.to_csv("mutual_info_l.csv")
+MI_nuevas.to_csv("mutual_info_a.csv")
+
+
+"""
+Coloque esto de las gráficas en un script por separado que solo puede ser ejecutado en local 
+
 
 # %%
 fig1 = plt.figure(figsize=(30,30))
@@ -123,4 +131,5 @@ plt.savefig("Eigen_" + str(N_datos) + "datos.png")
 # %%
 
 
-
+"""
+#Esto es todo folks!!
