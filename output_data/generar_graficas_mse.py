@@ -5,12 +5,12 @@ import sklearn
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 from sklearn.model_selection import train_test_split
-
+import sys
 ## %% 
 freq_min = 4
 freq_max = 65
-nombre_archivo_a = "a_Unif.csv"
-nombre_archivo_l = "l_Unif.csv"
+nombre_archivo_a = "a_Unif_30k.csv"
+nombre_archivo_l = "l_Unif_30k.csv"
 ## %%
 
 #Definimos las funciones de normalizar y de one-hot:
@@ -59,9 +59,19 @@ def normalizar(dataSet, features, parametros = []):
 
 #Creamos una función que reciba el número de valores propios a usar y devuelva las métricas MSE
 
-def MSE(archivo_eigen, archivo_omega, N):
-    datos_antigua = pd.read_csv(archivo_omega, delimiter=",", on_bad_lines='skip', usecols=tuple(range(26 + N)))
-    datos_nueva = pd.read_csv(archivo_eigen, delimiter=",", on_bad_lines='skip', usecols=tuple(range(26 + N)))
+def MSE(archivo_eigen, archivo_omega, N, sysarg = "full"):
+    datos_antigua_full = pd.read_csv(archivo_omega, delimiter=",", on_bad_lines='skip', usecols=tuple(range(26 + N)))
+    datos_nueva_full = pd.read_csv(archivo_eigen, delimiter=",", on_bad_lines='skip', usecols=tuple(range(26 + N)))
+    if sysarg == "full":
+        casillas_variables = True
+        datos_antigua = datos_antigua_full
+        datos_nueva = datos_nueva_full
+    else: 
+        estructura_cristalina = int(sysarg)
+        casillas_variables = False
+        datos_antigua = datos_antigua_full[datos_antigua_full["Cry_st"] == estructura_cristalina]
+        datos_nueva = datos_nueva_full[datos_nueva_full["Cry_st"] == estructura_cristalina]
+    #fin if 
     N_datos = len(datos_nueva)
     columnas_normalizar_a = list(datos_nueva.keys()[2:])
     columnas_normalizar_l = list(datos_antigua.keys()[2:])
@@ -124,12 +134,12 @@ def MSE(archivo_eigen, archivo_omega, N):
 #fin función
 
 ## %%
-def sacar_datos_MSE(freq_min, freq_max, archivo_eigen, archivo_omega):
-    datos_fin = MSE(archivo_eigen, archivo_omega, freq_min)
+def sacar_datos_MSE(freq_min, freq_max, archivo_eigen, archivo_omega, sysarg = "full"):
+    datos_fin = MSE(archivo_eigen, archivo_omega, freq_min, sysarg)
     resp_a = pd.DataFrame(); resp_ap = pd.DataFrame(); resp_l = pd.DataFrame(); resp_lp = pd.DataFrame();
     for i in range(freq_min, freq_max):
         print("Sacando MSE para " + str(i) +" frecuencias")
-        datos_fin = MSE(archivo_eigen, archivo_omega, i)
+        datos_fin = MSE(archivo_eigen, archivo_omega, i, sysarg)
         resp_a[i] = datos_fin["eigen"].T["MSE"]
         resp_ap[i] = datos_fin["eigen"].T["MSE_p"]
         resp_l[i] = datos_fin["antigua"].T["MSE"]
@@ -140,7 +150,7 @@ def sacar_datos_MSE(freq_min, freq_max, archivo_eigen, archivo_omega):
 
 ##%%
 
-def generar_graficas(dataFrame):
+def generar_graficas(dataFrame, sysarg = "full"):
     for key1 in dataFrame.keys():
         for key2 in dataFrame[key1].keys():
             fig = plt.figure(figsize=(30,30))
@@ -152,11 +162,20 @@ def generar_graficas(dataFrame):
                 ax.set_xlabel("Número de frecuencias usadas para entrenar")
                 ax.set_ylabel("MSE")
             #fin for
-            plt.savefig(key1 + "_" + key2 + "_scatter.png")
+            plt.savefig(key1 + "_" + key2 + "Cry_st:" + str(sysarg) +  "_scatter.png")
         #fin for 
     #fin for 
 #fin función
-                
 
-datos_MSE = sacar_datos_MSE(freq_min, freq_max, nombre_archivo_a, nombre_archivo_l)
-generar_graficas(datos_MSE)
+if len(sys.argv) != 2:
+    print("Uso del programa: python3 generar_info_mutua.py [Estructura Cristalina]")
+    print("Coloque un número entero para estructura cristalina o la palabra 'full' para usar todos los datos")
+    raise IndexError("El programa se debe correr con un solo argumento")
+#fin if 
+try:
+    opciones = int(sys.argv[1])
+except ValueError:
+    opciones = sys.argv[1]
+#fin ...
+datos_MSE = sacar_datos_MSE(freq_min, freq_max, nombre_archivo_a, nombre_archivo_l, opciones)
+generar_graficas(datos_MSE, opciones)

@@ -5,22 +5,34 @@ import sklearn
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 from sklearn.model_selection import train_test_split
+import sys
 
 # %%
-datos_antigua_full = pd.read_csv("output_data/l_Unif.csv", delimiter=",", on_bad_lines='skip')
-datos_nueva_full = pd.read_csv("output_data/a_Unif.csv", delimiter=",", on_bad_lines='skip')
-datos_antigua = datos_antigua_full
-datos_nueva = datos_nueva_full
+datos_antigua_full = pd.read_csv("output_data/l_Unif_30k.csv", delimiter=",", on_bad_lines='skip')
+datos_nueva_full = pd.read_csv("output_data/a_Unif_30k.csv", delimiter=",", on_bad_lines='skip')
+if len(sys.argv) != 2:
+    print("Uso del programa: python3 regresion_lineal.py [Estructura Cristalina]")
+    print("Coloque un número entero para estructura cristalina o la palabra 'full' para usar todos los datos")
+    raise IndexError("El programa se debe correr con un solo argumento")
+elif sys.argv[1] == "full":
+    casillas_variables = True
+    datos_antigua = datos_antigua_full
+    datos_nueva = datos_nueva_full
+else: 
+    estructura_cristalina = int(sys.argv[1])
+    casillas_variables = False
+    datos_antigua = datos_antigua_full[datos_antigua_full["Cry_st"] == estructura_cristalina]
+    datos_nueva = datos_nueva_full[datos_nueva_full["Cry_st"] == estructura_cristalina]
+#fin if 
 N_datos = len(datos_nueva)
 columnas_normalizar_a = list(datos_nueva.keys()[2:])
 columnas_normalizar_l = list(datos_antigua.keys()[2:])
 #print(columnas_normalizar_a)
 
-# %%
-def one_hottear(d_frame, cols_discretas):
+def one_hottear(d_frame, cols_discretas, fijo = True):
     cols_nuevas = []
     for column in cols_discretas:
-        posibles_valores = set(d_frame[column])
+        posibles_valores = set(d_frame[column]) if fijo else range(4)
         for i in posibles_valores:
             d_frame[column + str(i)] = 0
             d_frame.loc[d_frame[column] == i, column + str(i)] = 1
@@ -129,13 +141,13 @@ W_a = pd.DataFrame(W_a)
 # %%
 print("b y pesos para el problema adimensionalizado: ")
 print(W_a)
-nombre_archivo_a = "Regresion_lineal_a_" + str(N_datos) + ".csv"
+nombre_archivo_a = "R_lineal_a_" + "Cry_st:" + sys.argv[1] + "_" + str(N_datos) + ".csv"
 W_a.to_csv(nombre_archivo_a)
 
 # %%
 print("b y pesos para el problema a la antigua")
 print(W_l)
-nombre_archivo_l = "Regresion_lineal_l_" + str(N_datos) + ".csv"
+nombre_archivo_l = "R_lineal_l_" + "Cry_st:" + sys.argv[1] + "_" + str(N_datos) + ".csv"
 W_l.to_csv(nombre_archivo_l)
 
 # %%

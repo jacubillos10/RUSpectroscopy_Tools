@@ -2,12 +2,13 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
 
-MI_nuevas = pd.read_csv("mutual_info_a.csv", index_col=0)
-MI_antiguas = pd.read_csv("mutual_info_l.csv", index_col=0)
+
+MI_nuevas = pd.read_csv(nombre_archivo_a, index_col=0)
+MI_antiguas = pd.read_csv(nombre_archivo_l, index_col=0)
 targets = MI_nuevas.keys()
 features_nuevas = MI_nuevas.index
 features_antiguas = MI_antiguas.index
-N_datos = 30000
+N_datos = int(nombre_archivo_a[22:-4])
 
 fig1 = plt.figure(figsize=(20,20))
 for i in range(len(targets)):

@@ -4,20 +4,32 @@ import matplotlib.pyplot as plt
 import sklearn
 from sklearn.feature_selection import mutual_info_regression
 import pandas as pd
+import sys
 
 # %%
 datos_antigua_full = pd.read_csv("l_Unif_30k.csv", delimiter=",", on_bad_lines='skip')
 datos_nueva_full = pd.read_csv("a_Unif_30k.csv", delimiter=",", on_bad_lines='skip')
-
+#datos_antigua_full["Cry_st"] = datos_antigua_full["Cry_st"].astype(int)
+#datos_nueva_full["Cry_st"] = datos_nueva_full["Cry_st"].astype(int)
 # %%
-#datos_antigua = datos_antigua_full.sample(n =100)
-#datos_nueva = datos_nueva_full.sample(n = 100)
-datos_antigua = datos_antigua_full
-datos_nueva = datos_nueva_full
+if len(sys.argv) != 2:
+    print("Uso del programa: python3 generar_info_mutua.py [Estructura Cristalina]")
+    print("Coloque un número entero para estructura cristalina o la palabra 'full' para usar todos los datos")
+    raise IndexError("El programa se debe correr con un solo argumento")
+elif sys.argv[1] == "full":
+    casillas_variables = True
+    datos_antigua = datos_antigua_full
+    datos_nueva = datos_nueva_full
+else: 
+    estructura_cristalina = int(sys.argv[1])
+    casillas_variables = False
+    datos_antigua = datos_antigua_full[datos_antigua_full["Cry_st"] == estructura_cristalina]
+    datos_nueva = datos_nueva_full[datos_nueva_full["Cry_st"] == estructura_cristalina]
+#fin if 
 N_datos = len(datos_nueva)
 
 # %%
-datos_nueva.tail()
+print(datos_nueva[:][:5])
 
 # %%
 def normalizar(d_frame):
@@ -30,10 +42,10 @@ def normalizar(d_frame):
 #fin función
 
 # %%
-def one_hottear(d_frame, cols_discretas):
+def one_hottear(d_frame, cols_discretas, fijo = True):
     cols_nuevas = []
     for column in cols_discretas:
-        posibles_valores = set(d_frame[column])
+        posibles_valores = set(d_frame[column]) if fijo else range(4)
         for i in posibles_valores:
             d_frame[column + str(i)] = 0
             d_frame.loc[d_frame[column] == i, column + str(i)] = 1
@@ -50,8 +62,8 @@ normalizar(datos_nueva)
 datos_nueva.head()
 
 # %%
-one_hottear(datos_antigua, ["# Shape", "Cry_st"])
-one_hottear(datos_nueva, ["# Shape", "Cry_st"])
+one_hottear(datos_antigua, ["# Shape", "Cry_st"], casillas_variables)
+one_hottear(datos_nueva, ["# Shape", "Cry_st"], casillas_variables)
 datos_nueva.head()
 
 # %%
@@ -100,8 +112,8 @@ for i in range(len(targets)):
 MI_antiguas = pd.DataFrame(MI_antiguas)
 MI_nuevas = pd.DataFrame(MI_nuevas)
 
-MI_antiguas.to_csv("mutual_info_l.csv")
-MI_nuevas.to_csv("mutual_info_a.csv")
+MI_antiguas.to_csv("mutual_info_l_" + "CrySt_" + sys.argv[1] + "_" + str(N_datos) + ".csv")
+MI_nuevas.to_csv("mutual_info_a_" + "CrySt_" + sys.argv[1] + "_" + str(N_datos) + ".csv")
 
 
 """
