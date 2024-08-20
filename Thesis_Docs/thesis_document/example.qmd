@@ -1,0 +1,26 @@
+= Introduction
+In this report, we will explore the
+various factors that influence _fluid
+dynamics_ in glaciers and how they
+contribute to the formation and
+behaviour of these natural structures.
+
+
++ The climate
++ The topography
++ The geology
+
+
++ The climate
+  - Temperature
+  - Precipitation
++ The topography
++ The geology
+
+#figure(
+  image("img/Gauss_eig_10prim.png", width: 70%),
+  caption: [
+    Información mutua para los 10 primeros valores propios.
+  ],
+)
+
