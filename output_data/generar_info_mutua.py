@@ -114,34 +114,3 @@ MI_nuevas = pd.DataFrame(MI_nuevas)
 
 MI_antiguas.to_csv("mutual_info_l_" + "CrySt_" + sys.argv[1] + "_" + str(N_datos) + ".csv")
 MI_nuevas.to_csv("mutual_info_a_" + "CrySt_" + sys.argv[1] + "_" + str(N_datos) + ".csv")
-
-
-"""
-Coloque esto de las gráficas en un script por separado que solo puede ser ejecutado en local 
-
-
-# %%
-fig1 = plt.figure(figsize=(30,30))
-for i in range(len(targets)):
-    num = int(str(33) + str(i+1))
-    target = targets[i]
-    ax = fig1.add_subplot(num)
-    ax.barh(listas_antiguas[i], MI_antiguas[i])
-    ax.set_title(target)
-plt.savefig("Omega_" + str(N_datos) + "datos.png")
-
-# %%
-fig2 = plt.figure(figsize = (30,30))
-for i in range(len(targets)):
-    num = int(str(33) + str(i+1))
-    target = targets[i]
-    ax = fig2.add_subplot(num)
-    ax.barh(listas_nuevas[i], MI_nuevas[i])
-    ax.set_title(target)
-plt.savefig("Eigen_" + str(N_datos) + "datos.png")
-
-# %%
-
-
-"""
-#Esto es todo folks!!
