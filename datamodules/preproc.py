@@ -1,6 +1,11 @@
 import numpy as np 
 import pandas as pd
 
+N_disp_default = 10
+options_default = "Lineal"
+targets_default = ["C00", "C11", "C22", "C33", "C44", "C55", "C01", "C02", "C12"]
+
+
 def normalizar(dataSet, features, parametros = [], modo = "media-desv"):
     """
     Esta función resta la media y luego divide entre la desviación estandar de cada dato en cada columna. Si se le especifica la media y la desviación en los parámetros

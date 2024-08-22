@@ -4,6 +4,7 @@ from sklearn.feature_selection import mutual_info_regression
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+from . import preproc
 
 
 def info_mutua(N_freq_disp, Cobj, d_frame, opt = "Lineal"):
@@ -39,10 +40,9 @@ def info_mutua(N_freq_disp, Cobj, d_frame, opt = "Lineal"):
     return dict(map(lambda p: (lista_X[p], resp[p]), range(len(lista_X))))
 #fin función
 
-N_d = 10
-o_d = "Lineal"
-t_d = ["C00", "C11", "C22", "C33", "C44", "C55", "C01", "C02", "C12"]
-
+N_d = preproc.N_disp_default
+o_d = preproc.options_default
+t_d = preproc.targets_default 
 def MI(datos, N_disp=N_d, targets=t_d, options=o_d):
     """
     Esta función aplica info_mutua a cada una de las constantes espeficicadas en tagets, con los mismos features
