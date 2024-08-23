@@ -1,5 +1,6 @@
 from datamodules import preproc
 from datamodules import mutual_info
+from datamodules import linear_reg
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -23,8 +24,10 @@ else:
     datos_antigua = datos_antigua_full[datos_antigua_full["Cry_st"] == estructura_cristalina]
     datos_nueva = datos_nueva_full[datos_nueva_full["Cry_st"] == estructura_cristalina]
 #fin if
+
 N_datos = len(datos_nueva)
 preproc.normalizar(datos_nueva, datos_nueva.keys()[2:], modo="min-max")
 preproc.one_hottear(datos_nueva, ["# Shape", "Cry_st"], casillas_variables)
 MI_nuevos = mutual_info.MI(datos_nueva)
 mutual_info.graficar_info_mutua(MI_nuevos, "Eigen_" + sys.argv[1], N_datos)
+
