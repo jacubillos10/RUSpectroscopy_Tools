@@ -13,8 +13,8 @@ def generate_C_matrix(C_min, C_max, crystal_structure, distribution = 0):
         C_sec_raw = np.random.normal(0.5*C_min, 0.5*C_max, n_s)
     else:
         C_prc_raw = np.random.uniform(C_min, C_max, n_p)
-        C_max_sec = 0.5*min(C_prc_raw)
-        C_sec_raw = np.random.uniform(C_min, C_max_sec, n_s)
+        #C_max_sec = 0.5*min(C_prc_raw)
+        C_sec_raw = np.random.uniform(C_min, C_max, n_s)
     if crystal_structure == 1:
         C_prc[0:2] = C_prc_raw[0]
         C_prc[2] = C_prc_raw[1]
@@ -44,5 +44,3 @@ def generate_C_matrix(C_min, C_max, crystal_structure, distribution = 0):
     return C
 #end function
 
-if __name__ == "__main__":
-    cc.compile()

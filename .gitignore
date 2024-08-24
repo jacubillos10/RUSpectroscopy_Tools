@@ -14,6 +14,7 @@
 *.blg
 *.swp
 *.doc
+*.pyc
 build/*
 ruspectroscopy_tools.egg-info/*
 dist/*

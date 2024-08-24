@@ -11,7 +11,7 @@ if len(sys.argv) != 3:
     print("Coloque un número entero para estructura cristalina o la palabra 'full' para usar todos los datos")
     raise IndexError("El programa se debe correr con solo dos argumentos")
 else:
-    nombre_archivo = "output_data/" + sys.argv[2]
+    nombre_archivo = "input_data/" + sys.argv[2]
     dict_graficos = linear_reg.generar_MSE_multiples_frecuencias(4, 65, nombre_archivo, sysarg = sys.argv[1])
 #fin if
 
