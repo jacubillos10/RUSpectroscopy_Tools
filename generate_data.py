@@ -30,8 +30,8 @@ input_data = {
               }
 distt = ("Unif", "Gauss")
 pid = os.getpid()
-nombre_archivo = "output_data/d_" + distt[input_data["distribution"]] + "_" + str(pid) + ".csv"
-nombre_archivo_adim = "output_data/b_" + distt[input_data["distribution"]] + "_" + str(pid) +".csv" 
+nombre_archivo = "input_data/d_" + distt[input_data["distribution"]] + "_" + str(pid) + ".csv"
+nombre_archivo_adim = "input_data/b_" + distt[input_data["distribution"]] + "_" + str(pid) +".csv" 
 
 def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, N_freq, Ng, distribution, Verbose = False):
     alpha = (1, np.pi/4, np.pi/6)
@@ -106,7 +106,7 @@ if write_header:
         print(len(keys[0]), len(datos[0][0]))
         np.savetxt(f, datos[0], header = keys_adim, delimiter = ",")
 else:
-    for i in range(100000):
+    for i in range(8):
         input_data["Shape"] = np.random.randint(0, 3)
         input_data["Crystal_structure"] = np.random.randint(0,4) 
         datos = generate_eigenvalues(**input_data)
