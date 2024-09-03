@@ -12,10 +12,11 @@ C_ranks = (0.3, 5.6) #Al usar distribución uniforme estos son los rangos de los
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 Density = (2.0, 10)
-write_header = True
+write_header = False
 opcion_gen = "Omega"
 lista_cryst = ["Orthorombic", "Tetragonal", "Cubic", "Isotropic"]
 Shape_Names = ["Parallelepiped", "Cylinder", "Ellipsoid"]
+feasibility_Names = ["No", "Yes"]
 
 input_data = { 
                 "Dimensions": 
@@ -35,40 +36,36 @@ input_data = {
               }
 distt = ("Unif", "Gauss")
 pid = os.getpid()
-nombre_archivo = "input_data/d_" + distt[input_data["distribution"]] + "_" + str(pid) + ".csv"
-#nombre_archivo = "input_data/b_" + distt[input_data["distribution"]] + ".csv" 
+nombre_archivo = "input_data/df_" + distt[input_data["distribution"]] + "_" + str(pid) + ".csv"
+#nombre_archivo = "input_data/bf_" + distt[input_data["distribution"]] + ".csv" 
 
 def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, N_freq, Ng, distribution, options, Verbose = False):
     alpha = (1, np.pi/4, np.pi/6)
     tol = 1e-7
-    tries = 0
-    maxTry = 100
-    vals = np.ones(7)
-    norma_gamma = 1; norma_E = 1;
-    while (any((abs(vals[i]) > tol for i in range(6))) or norma_gamma > tol or norma_E > tol) and tries < maxTry:
-        dims = np.random.uniform(Dimensions["Min"], Dimensions["Max"])
-        vol = alpha[Shape]*np.prod(dims)
-        C = data_generator.generate_C_matrix(C_rank[0], C_rank[1], Crystal_structure, distribution)
-        rho = np.random.uniform(Density[0], Density[1])
-        dims_adim = dims/(vol**(1/3))
-        gamma = rus.gamma_matrix(Ng, C, dims_adim, Shape)
-        E = rus.E_matrix(Ng, Shape)
-        vals, vects = scipy.linalg.eigh(a = gamma, b = E)
-        norma_gamma = np.linalg.norm(gamma - gamma.T)
-        norma_E = np.linalg.norm(E - E.T)
-        tries += 1
-        if any((abs(vals[i]) > tol for i in range(6))):
-            print("WARNING: One of the first sixth eigenvalues is not zero. Recomputing...")
-            print("Iteration state: ", tries, " of ", maxTry)
-        if norma_gamma > tol or norma_E > tol:
-            print("Norma gamma: ", norma_gamma)
-            print("Norma E: ", norma_E)
-            print("Warning: Either gamma or E is non-symetric")
-            print("Iteration state: ", tries, " of ", maxTry)
-        #fin if
-        if tries >= maxTry:
-            raise StopIteration("Máximas iteraciones alcanzadas")
-    #fin while
+    dims = np.random.uniform(Dimensions["Min"], Dimensions["Max"])
+    vol = alpha[Shape]*np.prod(dims)
+    C = data_generator.generate_C_matrix(C_rank[0], C_rank[1], Crystal_structure, distribution)
+    rho = np.random.uniform(Density[0], Density[1])
+    dims_adim = dims/(vol**(1/3))
+    gamma = rus.gamma_matrix(Ng, C, dims_adim, Shape)
+    E = rus.E_matrix(Ng, Shape)
+    vals, vects = scipy.linalg.eigh(a = gamma, b = E)
+    norma_gamma = np.linalg.norm(gamma - gamma.T)
+    norma_E = np.linalg.norm(E - E.T)
+    if any((abs(vals[i]) > tol for i in range(6))):
+        #print("WARNING: One of the first sixth eigenvalues is not zero. Recomputing...")
+        #print("Iteration state: ", tries, " of ", maxTry)
+        feasible = 0
+    elif norma_gamma > tol or norma_E > tol:
+        print("Norma gamma: ", norma_gamma)
+        print("Norma E: ", norma_E)
+        print("Warning: Either gamma or E is non-symetric")
+        print("Iteration state: ", tries, " of ", maxTry)
+        feasible = 0
+    else:
+        feasible = 1
+    #fin if
+
     if N_freq == "all":
         N_freq = len(vals) - 6
     #fin if
@@ -78,15 +75,15 @@ def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, 
     str_Shape = Shape_Names[Shape]
     str_Crystal_structure = lista_cryst[Crystal_structure]
     if options == "Omega":
-        resp = [Shape, Crystal_structure, rho, *dims, *C_reshaped, *freqs_2] 
+        resp = [Shape, Crystal_structure, feasible, rho, *dims, *C_reshaped, *freqs_2] 
     else: 
-        resp = [Shape, Crystal_structure, *dims_adim, *C_reshaped, *eigenvals]
+        resp = [Shape, Crystal_structure, feasible, *dims_adim, *C_reshaped, *eigenvals]
     return resp
 #fin función
 
-def generate_keys(N_vals, options = "Adim"):
-    keys_ini = ["Shape", "Cry_st", "Density", "Lx", "Ly", "Lz"]
-    keys_ini_adim = ["Shape", "Cry_st", "bx", "by", "bz"]
+def generate_keys(N_vals, options):
+    keys_ini = ["Shape", "Cry_st", "Feasibility", "Density", "Lx", "Ly", "Lz"]
+    keys_ini_adim = ["Shape", "Cry_st", "Feasibility", "bx", "by", "bz"]
     keys_C = sum(map(lambda x: list(map(lambda y: "C" + str(x) + str(y) , range(x,6))), range(6)), [])
     keys_eigenvals = list(map(lambda x: "eig_" + str(x), range(N_vals)))
     keys_freq = list(map(lambda x: "(omega^2)_" + str(x), range(N_vals)))
@@ -105,9 +102,9 @@ if write_header:
     datos = generate_eigenvalues(**input_data)
     datos[0] = Shape_Names[int(datos[0])]
     datos[1] = lista_cryst[int(datos[1])]
+    datos[2] = feasibility_Names[int(datos[2])] 
     with open(nombre_archivo, "w+t") as f:
         print(len(keys), len(datos))
-        #np.savetxt(f, datos, header = keys_str, delimiter = ",")
         f.write(keys_str + "\n")
         writer_object = writer(f)
         writer_object.writerow(datos)
@@ -118,8 +115,8 @@ else:
         datos = generate_eigenvalues(**input_data)
         datos[0] = Shape_Names[int(datos[0])]
         datos[1] = lista_cryst[int(datos[1])]
+        datos[2] = feasibility_Names[int(datos[2])] 
         with open(nombre_archivo, "a+t") as f:
-            #np.savetxt(f, datos, delimiter = ",")
             writer_object = writer(f)
             writer_object.writerow(datos)
 
