@@ -8,11 +8,11 @@ import os
 from csv import writer
 
 np.set_printoptions(suppress = True)
-C_ranks = (0.3, 5.6) #Al usar distribución uniforme estos son los rangos de los C principales, al usar Gaussiana estos son la media y desviación respectivamente-
+C_ranks = (0.5*0.3, 2*5.6) #Al usar distribución uniforme estos son los rangos de los C principales, al usar Gaussiana estos son la media y desviación respectivamente-
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 Density = (2.0, 10)
-write_header = False
+write_header = True
 opcion_gen = "Omega"
 lista_cryst = ["Orthorombic", "Tetragonal", "Cubic", "Isotropic"]
 Shape_Names = ["Parallelepiped", "Cylinder", "Ellipsoid"]
