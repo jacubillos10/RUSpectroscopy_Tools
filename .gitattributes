@@ -1,8 +1,0 @@
-*.ipynb linguist-vendored
-*.tex linguist-vendored
-replicate_plots.py -linguist-vendored
-test_one_forward.py -linguist-vendored
-generate_data.py -linguist-vendored
-output_data/** linguist-vendored
-constant_data/** linguist-vendored
-LaTeX_Docs/** linguist-vendored

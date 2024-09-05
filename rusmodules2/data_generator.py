@@ -1,21 +1,21 @@
 import numpy as np
-from numba import njit, types
-from numba.pycc import CC
-cc = CC('data_generator')
 
-@njit("f8[:,:](f8,f8,i8)")
-@cc.export("generate_C_matrix", "f8[:,:](f8,f8,i8)")
-def generate_C_matrix(C_min, C_max, crystal_structure):
+def generate_C_matrix(C_min, C_max, crystal_structure = 0, distribution = 0):
     C = np.zeros((6,6))
     C_prc = np.zeros(3)
     C_sec = np.zeros(6)
     C_ter = np.zeros(12)
+    #dic_cry_st = {"Orthorombic": 0, "Tetragonal": 1, "Cubic": 2, "Isotropic": 3}
+    #crystal_structure_index = dic_cry_st[crystal_structure]
     d_struc = np.array([[3,6],[2,4],[1,2],[1,1]])
-    n_p = d_struc[crystal_structure,0]
-    n_s = d_struc[crystal_structure,1]
-    C_prc_raw = np.random.uniform(C_min, C_max, n_p)
-    C_max_sec = 0.5*min(C_prc)
-    C_sec_raw = np.random.uniform(C_min, C_max_sec, n_s)
+    n_p = d_struc[crystal_structure, 0]
+    n_s = d_struc[crystal_structure, 1]
+    if distribution == 1:
+        C_prc_raw = np.random.normal(C_min, C_max, n_p)
+        C_sec_raw = np.random.normal(0.5*C_min, 0.5*C_max, n_s)
+    else:
+        C_prc_raw = np.random.uniform(C_min, C_max, n_p)
+        C_sec_raw = np.random.uniform(C_min, C_max, n_s)
     if crystal_structure == 1:
         C_prc[0:2] = C_prc_raw[0]
         C_prc[2] = C_prc_raw[1]
@@ -45,5 +45,3 @@ def generate_C_matrix(C_min, C_max, crystal_structure):
     return C
 #end function
 
-if __name__ == "__main__":
-    cc.compile()
