@@ -8,11 +8,11 @@ import os
 from csv import writer
 
 np.set_printoptions(suppress = True)
-C_ranks = (0.5*0.3, 2*5.6) #Al usar distribución uniforme estos son los rangos de los C principales, al usar Gaussiana estos son la media y desviación respectivamente-
+C_ranks = (0, 1) #Al usar distribución uniforme estos son los rangos de los C principales, al usar Gaussiana estos son la media y desviación respectivamente-
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 Density = (2.0, 10)
-write_header = True
+write_header = False
 opcion_gen = "Omega"
 lista_cryst = ["Orthorombic", "Tetragonal", "Cubic", "Isotropic"]
 Shape_Names = ["Parallelepiped", "Cylinder", "Ellipsoid"]
@@ -26,12 +26,12 @@ input_data = {
                 },
                 "C_rank": C_ranks,
                 "Density": Density,
-                "Crystal_structure": 0,
+                "Crystal_structure": 4,
                 "Shape": 0,
                 "Verbose": False,
                 "N_freq": 100,
                 "distribution": 0,   #Cambiar esta linea al cambiar de distribución
-                "Ng": 14, 
+                "Ng": 8, 
                 "options": opcion_gen
               }
 distt = ("Unif", "Gauss")
@@ -109,9 +109,9 @@ if write_header:
         writer_object = writer(f)
         writer_object.writerow(datos)
 else:
-    for i in range(8):
+    for i in range(10000):
         input_data["Shape"] = np.random.randint(0, 3)
-        input_data["Crystal_structure"] = np.random.randint(0,4)
+        #input_data["Crystal_structure"] = np.random.randint(0,4)
         datos = generate_eigenvalues(**input_data)
         datos[0] = Shape_Names[int(datos[0])]
         datos[1] = lista_cryst[int(datos[1])]
