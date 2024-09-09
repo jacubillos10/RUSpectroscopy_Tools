@@ -12,7 +12,7 @@ C_ranks = (0, 1) #Al usar distribución uniforme estos son los rangos de los C p
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 Density = (2.0, 10)
-write_header = False
+write_header = True
 opcion_gen = "Omega"
 lista_cryst = ["Orthorombic", "Tetragonal", "Cubic", "Isotropic"]
 Shape_Names = ["Parallelepiped", "Cylinder", "Ellipsoid"]
@@ -26,7 +26,7 @@ input_data = {
                 },
                 "C_rank": C_ranks,
                 "Density": Density,
-                "Crystal_structure": 4,
+                "Crystal_structure": 3,
                 "Shape": 0,
                 "Verbose": False,
                 "N_freq": 100,
@@ -106,8 +106,8 @@ if write_header:
     with open(nombre_archivo, "w+t") as f:
         print(len(keys), len(datos))
         f.write(keys_str + "\n")
-        writer_object = writer(f)
-        writer_object.writerow(datos)
+        #writer_object = writer(f)
+        #writer_object.writerow(datos)
 else:
     for i in range(10000):
         input_data["Shape"] = np.random.randint(0, 3)
