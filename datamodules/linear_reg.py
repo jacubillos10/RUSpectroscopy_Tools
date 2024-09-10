@@ -45,11 +45,17 @@ def explorar_N_frecuencias(N, archivo, targets = t_d, cols_discretas = ["# Shape
         casillas_variables = 0
         datos = datos_full
     else:
-        estructura_cristalina = int(sysarg)
+        estructura_cristalina = sysarg
         casillas_variables = 4
         datos = datos_full[datos_full["Cry_st"] == estructura_cristalina]
     #fin if 
     N_datos = len(datos)
+    try:
+        del datos["Feasibility"]
+    except KeyError:
+        #print("No se encontró el feature de Factibilidad. Procediendo...")
+        pass
+    #fin exception
     cols_normalizar = list(filter(lambda x: x not in cols_discretas, datos.keys())) 
     preproc.one_hottear(datos, cols_discretas)
     Datos_train, Datos_test = train_test_split(datos, test_size = test_p)
