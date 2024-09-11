@@ -8,8 +8,8 @@ import os
 from csv import writer
 import sys
 
-if len(sys.argv) != 2:
-    raise IndexError("Coloque un argumento")
+if len(sys.argv) != 3:
+    raise IndexError("Coloque dos argumentos")
 #fin if 
 N_datos_generar = int(sys.argv[1])
 np.set_printoptions(suppress = True)
@@ -18,7 +18,7 @@ dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 Density = (2.0, 10)
 write_header = False
-opcion_gen = "Eigen"
+opcion_gen = sys.argv[2]
 lista_cryst = ["Orthorombic", "Tetragonal", "Cubic", "Isotropic"]
 Shape_Names = ["Parallelepiped", "Cylinder", "Ellipsoid"]
 feasibility_Names = ["No", "Yes"]
