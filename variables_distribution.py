@@ -59,6 +59,12 @@ def main():
         print(f"Error: El archivo '{csv_file}' no se encontró.")
         return
 
+    # Asegurarse de que las columnas seleccionadas existen en el DataFrame 
+    for col in selected_columns:
+        if col not in dataset_df.columns:
+            print(f"Error: La columna '{col}' no existe en el DataFrame.")
+            return
+            
     # Graficar las columnas seleccionadas y guardar si se proporciona una ruta
     plot_distribution_columns(dataset_df, selected_columns, save_path)
 
