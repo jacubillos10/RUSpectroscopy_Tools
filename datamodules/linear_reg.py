@@ -8,7 +8,8 @@ from . import preproc
 
 N_d = preproc.N_disp_default
 o_d = preproc.options_default
-t_d = preproc.targets_default 
+t_d = preproc.targets_default
+t_terc = preproc.terciary_targets
 
 def error_porcentual(y, y_gorro, estadisticos, target):
     media = estadisticos[target]["media"]
@@ -18,8 +19,9 @@ def error_porcentual(y, y_gorro, estadisticos, target):
     return ep
 #fin función
 
-def regresion_lineal(Datos_train, Datos_test, targets, Estadisticos_train):
-    features = list(filter(lambda x: x not in targets, Datos_train.keys()))
+def regresion_lineal(Datos_train, Datos_test, targets, Estadisticos_train, terc_targets = t_terc):
+    features = list(filter(lambda x: (x not in targets) and (x not in terc_targets), Datos_train.keys()))
+    print(features)
     X_train = Datos_train[features]
     X_test = Datos_test[features]
     W = dict()

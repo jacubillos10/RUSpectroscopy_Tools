@@ -1,19 +1,24 @@
 import numpy as np
 import rusmodules
 from rusmodules import rus
-from rusmodules import data_generator
+from datamodules import constant_generator
 import scipy
 from scipy import linalg 
 import os
 from csv import writer
+import sys
 
+if len(sys.argv) != 2:
+    raise IndexError("Coloque un argumento")
+#fin if 
+N_datos_generar = int(sys.argv[1])
 np.set_printoptions(suppress = True)
 C_ranks = (0, 1) #Al usar distribución uniforme estos son los rangos de los C principales, al usar Gaussiana estos son la media y desviación respectivamente-
 dim_min = (0.01, 0.01, 0.01)
 dim_max = (0.5, 0.5, 0.5)
 Density = (2.0, 10)
-write_header = True
-opcion_gen = "Omega"
+write_header = False
+opcion_gen = "Eigen"
 lista_cryst = ["Orthorombic", "Tetragonal", "Cubic", "Isotropic"]
 Shape_Names = ["Parallelepiped", "Cylinder", "Ellipsoid"]
 feasibility_Names = ["No", "Yes"]
@@ -36,7 +41,12 @@ input_data = {
               }
 distt = ("Unif", "Gauss")
 pid = os.getpid()
-nombre_archivo = "input_data/df_" + distt[input_data["distribution"]] + "_" + str(pid) + ".csv"
+if write_header:
+    name_h = "Header"
+else:
+    name_h = str(pid)
+#fin if
+nombre_archivo = "input_data/f_" + opcion_gen  + "_" + name_h + ".csv"
 #nombre_archivo = "input_data/bf_" + distt[input_data["distribution"]] + ".csv" 
 
 def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, N_freq, Ng, distribution, options, Verbose = False):
@@ -44,7 +54,7 @@ def generate_eigenvalues(Dimensions, C_rank, Density, Crystal_structure, Shape, 
     tol = 1e-7
     dims = np.random.uniform(Dimensions["Min"], Dimensions["Max"])
     vol = alpha[Shape]*np.prod(dims)
-    C = data_generator.generate_C_matrix(C_rank[0], C_rank[1], Crystal_structure, distribution)
+    C = constant_generator.generate_C_matrix(C_rank[0], C_rank[1], Crystal_structure, distribution)
     rho = np.random.uniform(Density[0], Density[1])
     dims_adim = dims/(vol**(1/3))
     gamma = rus.gamma_matrix(Ng, C, dims_adim, Shape)
@@ -109,7 +119,7 @@ if write_header:
         #writer_object = writer(f)
         #writer_object.writerow(datos)
 else:
-    for i in range(10000):
+    for i in range(N_datos_generar):
         input_data["Shape"] = np.random.randint(0, 3)
         #input_data["Crystal_structure"] = np.random.randint(0,4)
         datos = generate_eigenvalues(**input_data)

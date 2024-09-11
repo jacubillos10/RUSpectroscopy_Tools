@@ -4,7 +4,7 @@ import pandas as pd
 N_disp_default = 10
 options_default = "Lineal"
 targets_default = ["C00", "C11", "C22", "C33", "C44", "C55", "C01", "C02", "C12"]
-
+terciary_targets = ["C03", "C04", "C05", "C13", "C14", "C15", "C23", "C24", "C25", "C34", "C35", "C45"]
 
 def normalizar(dataSet, features, parametros = [], modo = "media-desv"):
     """

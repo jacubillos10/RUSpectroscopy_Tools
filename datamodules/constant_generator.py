@@ -26,9 +26,11 @@ def generate_C_matrix(C_min, C_max, crystal_structure = 0, distribution = 0):
         C_sec[0:3] = C_sec_raw[0]
         C_sec[3:] = C_sec_raw[1]
     elif crystal_structure == 3:
-        C_prc[:] = C_prc_raw[0] + 2*C_sec_raw[0]
-        C_sec[0:3] = C_prc_raw[0]
-        C_sec[3:] = C_sec_raw[0]
+        Kha = C_prc_raw[0]
+        mu = C_sec_raw[0]
+        C_prc[:] = Kha + (4/3)*mu
+        C_sec[0:3] = Kha - (2/3)*mu
+        C_sec[3:] = mu
     else: 
         C_prc = C_prc_raw
         C_sec = C_sec_raw

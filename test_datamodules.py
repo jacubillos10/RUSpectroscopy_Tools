@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import sys
 
 path_datos = sys.argv[1]
+opcion_gen = "Eigen"
 
 if len(sys.argv) != 3:
     print("Uso del programa: python3 test_datamodules.py [Path archivo] [Estructura Cristalina]")
@@ -14,6 +15,7 @@ if len(sys.argv) != 3:
     raise IndexError("El programa se debe correr con 3 argumentos")
 elif sys.argv[2] == "full":
     datos_full = pd.read_csv(path_datos, delimiter=",", on_bad_lines='skip')
+    estructura_cristalina = "full"
     casillas_variables = 0
     datos = datos_full
 else:
@@ -36,5 +38,5 @@ N_datos = len(datos)
 preproc.normalizar(datos, datos.keys()[2:], modo="min-max")
 preproc.one_hottear(datos, lista_one_hot, casillas_variables)
 MI_data = mutual_info.MI(datos)
-mutual_info.graficar_info_mutua(MI_data, estructura_cristalina+ "_", N_datos)
+mutual_info.graficar_info_mutua(MI_data, str(estructura_cristalina) + "_" + opcion_gen, N_datos)
 
