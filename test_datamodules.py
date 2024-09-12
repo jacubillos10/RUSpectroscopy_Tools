@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import sys
 
 path_datos = sys.argv[1]
-opcion_gen = "Eigen"
+opcion_gen = "Eigen_conK"
+def_targets = ["K", "C44", "C01", "C00"]
 
 if len(sys.argv) != 3:
     print("Uso del programa: python3 test_datamodules.py [Path archivo] [Estructura Cristalina]")
@@ -33,10 +34,15 @@ except KeyError:
 
 print(datos.keys())
 lista_one_hot = list(filter(lambda x: any((y in x for y in ["Shape", "Cry_st"])), datos.keys()))
-print(lista_one_hot)
 N_datos = len(datos)
-preproc.normalizar(datos, datos.keys()[2:], modo="min-max")
+if estructura_cristalina == "Isotropic":
+    datos["K"] = datos["C01"] + (2/3)*datos["C44"]
+#fin if
+
+lista_non_categorical = list(filter(lambda x: all((y not in x for y in ["Shape", "Cry_st", "# Shape"])), datos.keys())) 
+preproc.normalizar(datos, lista_non_categorical, modo="min-max")
 preproc.one_hottear(datos, lista_one_hot, casillas_variables)
-MI_data = mutual_info.MI(datos)
+MI_data = mutual_info.MI(datos, targets = def_targets)
 mutual_info.graficar_info_mutua(MI_data, str(estructura_cristalina) + "_" + opcion_gen, N_datos)
+
 

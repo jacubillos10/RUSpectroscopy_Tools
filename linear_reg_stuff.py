@@ -6,9 +6,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sys
 
-nombre_personalizado = "eigen_30k"
-#cols_disc = ["Shape", "Cry_st"]
-cols_disc = ["# Shape", "Cry_st"]
+nombre_personalizado = "eigen_40k"
+cols_disc = ["Shape", "Cry_st"]
+#cols_disc = ["# Shape", "Cry_st"]
+
 if len(sys.argv) != 3:
     print("Uso del programa: python3 test_datamodules.py [Nombre del archivo dentro de input_data] [Estructura Cristalina] ")
     print("Coloque la estructura cristalina o la palabra 'full' para usar todos los datos")

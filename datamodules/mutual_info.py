@@ -63,10 +63,11 @@ def graficar_info_mutua(data_MI, nombre, N_datos = "FULL"):
     """
     fig2 = plt.figure(figsize = (20,20))
     targets = tuple(data_MI.keys())
+    len_cuadro = int(np.ceil(len(targets)**(1/2)))
     for i in range(len(targets)):
-        num = int(str(33) + str(i+1))
+        par_plot = (len_cuadro, len_cuadro, i+1)     
         target = targets[i]
-        ax = fig2.add_subplot(num)
+        ax = fig2.add_subplot(*par_plot)
         ax.barh(data_MI.index, data_MI[target])
         ax.set_title(target, fontsize=24)
         ax.tick_params(axis='x', labelsize=21)  # Larger x-labels
