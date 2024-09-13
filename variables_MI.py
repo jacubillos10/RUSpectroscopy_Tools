@@ -59,7 +59,7 @@ def main():
 
     # Configurar argparse para aceptar el CSV, múltiples targets y variables
     parser = argparse.ArgumentParser(description="Mostrar la información mutua entre varios targets y varias variables en un único gráfico.")
-    parser.add_argument('--csv', type=str, help="Ruta del archivo CSV.", default='data/f_Eigen_Header.csv')
+    parser.add_argument('--csv', type=str, help="Ruta del archivo CSV.", default='data/f_Omega_Header.csv')
     parser.add_argument('--variables', nargs='+', required=False, help="Columnas del dataset a comparar con los targets", default=None)
     parser.add_argument('--targets', nargs='+', required=True, help="Columnas objetivo para calcular la información mutua")
     parser.add_argument('--save', type=str, help="Ruta donde guardar el gráfico generado.", default='/tmp/MI_multiple_targets.png')
@@ -77,6 +77,8 @@ def main():
     except FileNotFoundError:
         print(f"Error: El archivo '{csv_file}' no se encontró.")
         return
+    
+    dataset_df['K'] = dataset_df['C01'] + (2/3)*dataset_df['C44']
     
     if selected_columns is None:
         selected_columns = list(dataset_df.columns[:37])
