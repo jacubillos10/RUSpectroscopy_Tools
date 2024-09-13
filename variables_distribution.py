@@ -2,6 +2,8 @@ import argparse
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import re
+
 
 def plot_distribution_columns(df, columns, save_path=None):
 
@@ -42,14 +44,15 @@ def plot_distribution_columns(df, columns, save_path=None):
 def main():
     # Configurar argparse para aceptar el CSV, columnas y la opción de guardar el gráfico
     parser = argparse.ArgumentParser(description="Generar histogramas de columnas del dataset.")
-    parser.add_argument('--csv', type=str, help="Ruta del archivo CSV.", default='data/lf_Isotropic.csv')
-    parser.add_argument('--variables', nargs='+', required=True, help="Columnas del dataset a graficar")
+    parser.add_argument('--csv', type=str, help="Ruta del archivo CSV.", default='data/f_Eigen_Header.csv')
+    parser.add_argument('--variables', nargs='+', required=False, help="Columnas del dataset a graficar", default = None)
     parser.add_argument('--save', type=str, help="Ruta donde guardar el gráfico generado.", default='/tmp/variables_distribution.png')
 
     args = parser.parse_args()
     csv_file = args.csv
     selected_columns = args.variables
     save_path = args.save
+
     
     # Cargar dataset desde el archivo CSV proporcionado por el usuario
     try:
@@ -59,11 +62,20 @@ def main():
         print(f"Error: El archivo '{csv_file}' no se encontró.")
         return
 
-    # Asegurarse de que las columnas seleccionadas existen en el DataFrame 
-    for col in selected_columns:
-        if col not in dataset_df.columns:
-            print(f"Error: La columna '{col}' no existe en el DataFrame.")
-            return
+
+    
+    if selected_columns is None:
+        regex = r'C\d{2}'
+        coeficientes = [col for col in dataset_df.columns if re.match(regex, col)]
+        coeficientes_no_nulos = [col for col in coeficientes if dataset_df[col].nunique() != 1]
+        selected_columns = coeficientes_no_nulos
+
+    else:
+        # Asegurarse de que las columnas seleccionadas existen en el DataFrame 
+        for col in selected_columns:
+            if col not in dataset_df.columns:
+                print(f"Error: La columna '{col}' no existe en el DataFrame.")
+                return
             
     # Graficar las columnas seleccionadas y guardar si se proporciona una ruta
     plot_distribution_columns(dataset_df, selected_columns, save_path)
