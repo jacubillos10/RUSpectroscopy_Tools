@@ -23,7 +23,8 @@ def info_mutua(N_freq_disp, Cobj, d_frame, opt = "Lineal"):
         N_col = 3
     else:
         raise KeyError("No hay columnas llamadas eig_X o (omega^2)_X")
-    #fin if 
+    #fin if
+    #LINEA DE ABAJO ES PROBLEMÁTICA!!!!
     lista_ini = list(d_frame.keys()[:N_col]) + list(d_frame.keys()[-7:])
     lista_eig_raw = list(filter(lambda x: key_str in x, d_frame.keys()))
     if opt == "Log":
