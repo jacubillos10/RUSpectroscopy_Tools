@@ -3,19 +3,20 @@ from datamodules import parameter_combinator
 from rusmodules import rus
 from datamodules import preproc
 import scipy
+import sys
+import os 
 
 targets_default = preproc.targets_default
 
-def generate_data_frame(row_indexes, d_frame, cry_st, Ng=8, N_freq = 100, shape = "Parallelepiped", mode = "Eigen"):
+def generate_data_frame(row_indexes, d_frame, cry_st, Ng=8, N_freq = 100, shape = "Parallelepiped"):
     tol = 1e-7
-    name_key_eigen = "(omega^2)" if "rho" in d_frame.keys() else "eig"
-    keys_obj = list(map(lambda x: name_key_eigen + str(x), range(N_freq))) 
-    d_frame["Feasible"] = None
-    d_frame[keys_obj] = None
+    name_key_eigen = "(omega^2)_" if "rho" in d_frame.keys() else "eig"
+    keys_obj = list(map(lambda x: name_key_eigen + str(x), range(N_freq)))
     dict_shape = {"Parallelepiped": 0, "Cylinder": 1, "Ellipsoid": 2}
     alphas = (1, np.pi/4, np.pi/6)
     alpha = alphas[dict_shape[shape]]
-    for i in range(row_indexes[0], row_indexes[1]):
+    iterator = range(len(d_frame)) if row_indexes == "full" else range(row_indexes[0], row_indexes[1])
+    for i in iterator:
         row = d_frame.iloc[i]
         C = np.zeros((6,6))
         vol = alpha*row["lx"]*row["ly"]*row["lz"]
@@ -47,14 +48,14 @@ def generate_data_frame(row_indexes, d_frame, cry_st, Ng=8, N_freq = 100, shape 
         else:
             feasible = 1
         #fin if
-        l_feasible = ["No", "Yes"]
+        l_feasible = ["No", "Yes", "OJO!!"]
         d_frame.loc[i, "Feasible"] = l_feasible[feasible]
         if N_freq == "all":
             N_freq = len(vals) - 6
         #fin if
         eigenvals = vals[6:N_freq+6]
         if "rho" in d_frame.keys():
-            freqs_2 = eigenvals/(rho * vol**(2/3))
+            freqs_2 = eigenvals/(row["rho"] * vol**(2/3))
             d_frame.loc[i, keys_obj] = freqs_2
         else:
             d_frame.loc[i, keys_obj] = eigenvals
@@ -62,6 +63,10 @@ def generate_data_frame(row_indexes, d_frame, cry_st, Ng=8, N_freq = 100, shape 
     #fin for 
 #fin función
 
-d_frame = parameter_combinator.generate_combinations("Isotropic", "Eigen", (0.01,1), (0.01, 1))
-generate_data_frame((12500,12520), d_frame, "Isotropic")
-print(d_frame.iloc[12500:12520])
+d_frame = parameter_combinator.generate_combinations("Isotropic", sys.argv[3], (0,1), (0.01, 1))
+try:
+    generate_data_frame((int(sys.argv[1]), int(sys.argv[2])), d_frame, "Isotropic", shape = sys.argv[4])
+    d_frame.iloc[int(sys.argv[1]):int(sys.argv[2])].to_csv("input_data/Combinatoriales_"+str(os.getpid()) + "_" + sys.argv[3] + "_" + sys.argv[4] + ".csv")
+except ValueError:
+    generate_data_frame(sys.argv[1], d_frame, "Isotropic", shape = sys.argv[4]) 
+    d_frame.to_csv("input_data/Combinatoriales_"+str(os.getpid()) + "_" + sys.argv[3] + "_" + sys.argv[4] + ".csv")
