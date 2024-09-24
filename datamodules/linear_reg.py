@@ -41,8 +41,12 @@ def regresion_lineal(Datos_train, Datos_test, targets, Estadisticos_train, terc_
     return W
 #fin función
 
-def explorar_N_frecuencias(N, archivo, targets = t_d, cols_discretas = ["# Shape", "Cry_st"], test_p = 0.4, sysarg = "full"):
-    datos_full = pd.read_csv(archivo, delimiter = ",", on_bad_lines="skip", usecols=tuple(range(26+N)))
+def explorar_N_frecuencias(N, datos_full_raw, targets = t_d, cols_discretas = ["# Shape", "Cry_st"], test_p = 0.4, sysarg = "full", ignore_cols = []):
+    #datos_full = pd.read_csv(archivo, delimiter = ",", on_bad_lines="skip", usecols=tuple(range(26+N)))
+    mandatory_cols = list(filter(lambda x: "eig" not in x and "omega" not in x and x not in ignore_cols, datos_full_raw.keys()))
+    eig_cols = list(filter(lambda x: "eig" in x or "omega" in x, datos_full_raw.keys()))[:N]
+    cols_total = mandatory_cols + eig_cols
+    datos_full = datos_full_raw[cols_total]
     if sysarg == "full":
         casillas_variables = 0
         datos = datos_full
@@ -52,26 +56,30 @@ def explorar_N_frecuencias(N, archivo, targets = t_d, cols_discretas = ["# Shape
         datos = datos_full[datos_full["Cry_st"] == estructura_cristalina]
     #fin if 
     N_datos = len(datos)
-    try:
+    if "Feasible" in datos.keys():
+        del datos["Feasible"]
+    elif "Feasibility" in datos.keys():
         del datos["Feasibility"]
-    except KeyError:
-        #print("No se encontró el feature de Factibilidad. Procediendo...")
-        pass
-    #fin exception
+    #fin if
     cols_normalizar = list(filter(lambda x: x not in cols_discretas, datos.keys())) 
     preproc.one_hottear(datos, cols_discretas)
-    Datos_train, Datos_test = train_test_split(datos, test_size = test_p)
+    if type(test_p) == float:
+        Datos_train, Datos_test = train_test_split(datos, test_size = test_p)
+    else: 
+        Datos_train = datos
+        Datos_test = test_p
+    #fin if 
     Estadisticos_train = dict(map(lambda x: (x, {"media": np.mean(Datos_train[x]), "desviacion": np.std(Datos_train[x])}), Datos_train.keys()))
     preproc.normalizar(Datos_train, cols_normalizar)
     preproc.normalizar(Datos_test, cols_normalizar, Estadisticos_train)
     return regresion_lineal(Datos_train, Datos_test, targets, Estadisticos_train)
 #fin función
 
-def generar_MSE_multiples_frecuencias(freq_min, freq_max, archivo, targets = t_d, cols_discretas = ["# Shape", "Cry_st"], test_p = 0.4, sysarg = "full"):
+def generar_MSE_multiples_frecuencias(freq_min, freq_max, archivo, targets = t_d, cols_discretas = ["# Shape", "Cry_st"], test_p = 0.4, sysarg = "full", ignore_cols = []):
     resp_MSE = pd.DataFrame(); resp_MCEP = pd.DataFrame();
     for i in range(freq_min, freq_max):
         print("Sacando errores para " + str(i) + " frecuencias")
-        datos_W = explorar_N_frecuencias(i, archivo, targets, cols_discretas, test_p, sysarg)
+        datos_W = explorar_N_frecuencias(i, archivo, targets, cols_discretas, test_p, sysarg, ignore_cols)
         resp_MSE[i] = datos_W.T["MSE"]
         resp_MCEP[i] = datos_W.T["MCEP"]
     #fin for 
