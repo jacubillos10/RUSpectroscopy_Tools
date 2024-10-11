@@ -15,7 +15,7 @@ def make_mi_scores(X, y):
     discrete_features = [pd.api.types.is_integer_dtype(t) for t in X.dtypes]
     mi_scores = mutual_info_regression(X, y, discrete_features=discrete_features, random_state=0)
     mi_scores = pd.Series(mi_scores, name="MI Scores", index=X.columns)
-    mi_scores = mi_scores.sort_values(ascending=False)
+    #mi_scores = mi_scores.sort_values(ascending=False)
     return mi_scores
 
 def plot_mi_scores_multiple_targets(mi_scores_dict, save_path=None):
@@ -59,10 +59,10 @@ def main():
 
     # Configurar argparse para aceptar el CSV, múltiples targets y variables
     parser = argparse.ArgumentParser(description="Mostrar la información mutua entre varios targets y varias variables en un único gráfico.")
-    parser.add_argument('--csv', type=str, help="Ruta del archivo CSV.", default='data/f_Omega_Header.csv')
+    parser.add_argument('--csv', type=str, help="Ruta del archivo CSV.", default='data/f_Eigen_Header.csv')
     parser.add_argument('--variables', nargs='+', required=False, help="Columnas del dataset a comparar con los targets", default=None)
     parser.add_argument('--targets', nargs='+', required=True, help="Columnas objetivo para calcular la información mutua")
-    parser.add_argument('--save', type=str, help="Ruta donde guardar el gráfico generado.", default='/tmp/MI_multiple_targets.png')
+    parser.add_argument('--save', type=str, help="Ruta donde guardar el gráfico generado.", default='./assignments/MI_f_Eigen.png')
 
     args = parser.parse_args()
     csv_file = args.csv
@@ -111,6 +111,7 @@ def main():
 
         # Calcular los scores de información mutua
         mi_scores = make_mi_scores(X, y)
+        print(mi_scores)
         mi_scores_dict[target_column] = mi_scores
 
     # Graficar los resultados para múltiples targets en un único gráfico
