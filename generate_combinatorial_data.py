@@ -25,7 +25,7 @@ def fill_eigenvalues(Ng, independent_constants, gamma, beta, eta, shape):
     C_shear_prim = np.array(tuple(map(lambda i: tuple(map(lambda j: 1 if i != j and i<3 and j<3 else 0, range(6))), range(6)))) #Valores de C01, C02, C12
     C_shear_sec = np.array(tuple(map(lambda i: tuple(map(lambda j: 1 if i != j and i>=3 and j>=3 else 0, range(6))), range(6)))) #Valores de C34, C35, C45
     if len(independent_constants) == 2:
-        C_prim = Cprim * (independent_constants["K"] + (4/3)*independent_constants["mu"])
+        C_prim = C_prim * (independent_constants["K"] + (4/3)*independent_constants["mu"])
         C_sec = C_sec * independent_constants["mu"]
         C_shear_prim = C_shear_prim * (independent_constants["K"] - (2/3)*independent_constants["mu"])
         C = C_prim + C_sec + C_shear_prim
