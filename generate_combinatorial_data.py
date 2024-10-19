@@ -4,45 +4,8 @@ import scipy
 import os
 import itertools
 from datamodules import preproc
-from rusmodules import rus
+from rusmodules import rus, eigenvals
 
-def fill_eigenvalues(Ng, independent_constants, gamma, beta, shape):
-    """
-    @input Ng <int>: Grado máximos de las funciones base en el forward problem
-    @input independent_constants <dict>: Valor de las contantes elásticas independientes. 
-        Por ejemplo: independent_constants = {"K": 0.45, "mu": 0.25}
-    @input gamma <double>: Relación entre las dimensiones a y b: b/a
-    @input beta <double>: Relación entre las dimensiones c y a: c/a
-    @input eta <double>: Relación entre las dimensiones b y c: c/b
-    @input shape <string>: Forma de la muestra
-    @output vals <np.array>: Valores propios del forward problem en cuestión
-    """
-    C = np.zeros((6,6))
-    alphas = {"Parallelepiped": 1, "Cylinder": np.pi/4, "Ellipsoid": np.pi/6}
-    alpha = alphas[shape]
-    C_prim = np.array(tuple(map(lambda i: tuple(map(lambda j: 1 if i == j and i<3 else 0, range(6))), range(6)))) #Valores de C00, C11, C22
-    C_sec = np.array(tuple(map(lambda i: tuple(map(lambda j: 1 if i == j and i >= 3 else 0, range(6))), range(6)))) #Valores de C33, C44, C55
-    C_shear_prim = np.array(tuple(map(lambda i: tuple(map(lambda j: 1 if i != j and i<3 and j<3 else 0, range(6))), range(6)))) #Valores de C01, C02, C12
-    C_shear_sec = np.array(tuple(map(lambda i: tuple(map(lambda j: 1 if i != j and i>=3 and j>=3 else 0, range(6))), range(6)))) #Valores de C34, C35, C45
-    if len(independent_constants) == 2:
-        C_prim = C_prim * (independent_constants["K"] + (4/3)*independent_constants["mu"])
-        C_sec = C_sec * independent_constants["mu"]
-        C_shear_prim = C_shear_prim * (independent_constants["K"] - (2/3)*independent_constants["mu"])
-        C = C_prim + C_sec + C_shear_prim
-    #fin if 
-    if shape in ("Parallelepiped", "Ellipsoid"):
-        a = 1/((alpha*gamma*beta)**(1/3))
-        b = gamma*a
-        c = beta*a
-    #fin if 
-    geometry = np.array([a,b,c])
-    vol = alpha*np.prod(geometry)
-    Gamma = rus.gamma_matrix(Ng, C, geometry, shape)
-    E = rus.E_matrix(Ng, shape)
-    vals = scipy.linalg.eigvalsh(Gamma, b = E)
-    #fin if
-    return vals
-#fin función
 
 def gen_combinatorial_parameters(Ng, C_rank, Np_dim, shape, N_freq):
     """
