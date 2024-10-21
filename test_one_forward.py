@@ -1,7 +1,7 @@
 import numpy as np
 import rusmodules
 from rusmodules import rus
-#from rusmodules import rus_old
+from rusmodules import eigenvals
 import scipy
 import matplotlib.pyplot as plt
 import time
@@ -23,10 +23,10 @@ Ng = 16
 rho = 4.869 #g/cm^3
 nombre_archivo = 'constantesSmB6.csv' #Mbar
 """
-A = 11
+A = 1
 #Datos del URu2Si2
 Ng = 14
-m = 0.20688 #g 9.84029 #9.839 #g/cm^3 
+m = (A**3) * 0.20688 #g 9.84029 #9.839 #g/cm^3 
 m_p = (A**3) * m
 nombre_archivo = 'constant_data/constantesURu2Si2.csv' #Mbar
 
@@ -34,45 +34,45 @@ nombre_archivo = 'constant_data/constantesURu2Si2.csv' #Mbar
 C_const = np.genfromtxt(nombre_archivo, delimiter=',', skip_header=0, dtype=float)
 #geometry = np.array([0.30529,0.20353,0.25334]) #cm  FeGa
 #geometry = np.array([0.10872, 0.13981, 0.01757]) #cm SmB6
-geometry = np.array([0.29605, 0.31034, 0.29138]) #cm URu2Si2
+geometry = A * np.array([0.29605, 0.31034, 0.29138]) #cm URu2Si2
 geometry_p = A * geometry
-vol = alpha*np.prod(geometry)
-vol_p = alpha*np.prod(geometry_p)
-gamma = rus.gamma_matrix(Ng, C_const, geometry, shape)
+#vol = alpha*np.prod(geometry)
+r = (sum(geometry**2))**0.5
+Gamma = rus.gamma_matrix(Ng, C_const, geometry, shape)
 E = rus.E_matrix(Ng, shape)
-
-vals, vects = scipy.linalg.eigh(a = (vol**(-1/3))*gamma, b = E)
-
-print("Norma: ", np.linalg.norm(gamma - gamma.T))
-print("Norma: ", np.linalg.norm(E - E.T))
-
-freq = (vals[6:]*(vol**(1/3))/m)**0.5
+vals, vects = scipy.linalg.eigh(a = Gamma/r, b = E)
+#print("Norma: ", np.linalg.norm(gamma - gamma.T))
+#print("Norma: ", np.linalg.norm(E - E.T))
+freq = (vals[6:]*(r/m))**0.5
 freq_vueltas = freq*(1/(2*np.pi))
-#np.savetxt(nombre_archivo[:-4] + '_freq_' + str(shape) +'.csv', np.c_[range(len(vals)), freq, freq_vueltas], delimiter = ',')
+print("Original:")
+print("Eigs completos:")
 print(vals[6:6+12])
+vals_new = vals[6:]
+vals_new[1:] = vals_new[1:]/vals_new[0]
+print("Eigs relativos:")
+print(vals_new[:12])
+print("Frecuencias en MHz:")
 print(freq_vueltas[:12])
-"""
-gamma_p = rus.gamma_matrix(Ng, C_const, geometry_p, shape)
-E_p = rus.E_matrix(Ng, shape)
 
-vals_p, vects_p = scipy.linalg.eigh(a = (vol_p**(-1/3))*gamma_p, b = E_p)
-freq_p = (vals_p[6:]*(vol_p**(1/3))/m_p)**0.5
-freq_vueltas_p = freq_p*(1/(2*np.pi))
+print("NEW:")
+eta = 2*np.arccos(geometry[2]/r)
+beta = 4*np.arctan(geometry[1]/geometry[0])
+shapes = ["Parallelepiped", "Cylinder", "Ellipsoid"]
+eigenvalues_test = eigenvals.get_eigenvalues(Ng, C_const, eta, beta, shapes[shape])["eig"]
+print("Eigs relativos:")
+print(eigenvalues_test[:12])
+eigenvalues_test[1:] = eigenvalues_test[1:] * eigenvalues_test[0]
+print("Eigs completos:")
+print(eigenvalues_test[:12])
 
-print("N vals: ", len(vals))
-print(freq_vueltas[:12])
-print(freq_vueltas_p[:12])
-print(vals[6:6+12])
-print(vals_p[6:6+12])
-eigenvalue_index = np.array(range(len(vals[6:])))
-"""
-"""
-fig = plt.figure()
-ax1 = fig.add_subplot(111)
-ax1.plot(eigenvalue_index, freq_vueltas, eigenvalue_index, freq_vueltas_p)
-ax1.set_xlabel("Indice del valor propio")
-ax1.set_ylabel("Frecuencia en Hz")
-ax1.legend(["A = 1", "A = 2"])
-plt.show()
-"""
 
+print("Test de generador de valores propios relativos")
+const_relations = {"x_K": 4, "x_mu": 3}
+eta = np.pi/2
+beta = np.pi/2
+vals_peq = eigenvals.get_eigenvalues_from_crystal_structure(Ng, const_relations, eta, beta, "Ellipsoid")["eig"]
+print(vals_peq)
+vals_big = eigenvals.get_eigenvalues_from_crystal_structure(Ng, const_relations, eta, beta, "Ellipsoid", 3)["eig"]
+print(vals_big)
+print(vals_big[0]/vals_peq[0])

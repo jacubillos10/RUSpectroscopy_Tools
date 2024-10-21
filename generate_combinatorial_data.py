@@ -19,7 +19,7 @@ def gen_combinatorial_parameters(Ng, C_rank, Np_dim, shape, N_freq):
     #N_dir = {"Parallelepiped": 2, "Cylinder": 2, "Ellipsoid": 2}
     #keys_dims = {"Parallelepiped": ["gamma", "beta"], "Cylinder": ["gamma", "beta"], "Ellipsoid": ["gamma", "beta"]}
     N_dir = 2
-    keys_dims = ("gamma", "beta")
+    keys_dims = ("eta", "beta")
     combinations_param = np.array(tuple(itertools.product(*(np.linspace(C_rank[key]["min"] 
                         + (1/C_rank[key]["Finura"]), C_rank[key]["max"], C_rank[key]["Finura"]) for key in C_rank.keys()))))
     combinations_dims = np.array(tuple(itertools.combinations_with_replacement(np.linspace((1/Np_dim), 1, Np_dim), N_dir)))
