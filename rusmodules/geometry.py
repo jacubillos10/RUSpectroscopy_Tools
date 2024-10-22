@@ -22,7 +22,7 @@ def generate_sphere_surface_points(N, max_theta, max_phi, options = {"theta": Fa
 #fin función
 
 if __name__ == "__main__":
-    combi = generate_sphere_surface_points(100, 0.5*np.pi, np.pi, options = {"theta": True, "phi": True})
+    combi = generate_sphere_surface_points(4, 0.5*np.pi, np.pi, options = {"theta": True, "phi": True})
     print(combi)
     print("Número de puntos")
     print(len(combi))

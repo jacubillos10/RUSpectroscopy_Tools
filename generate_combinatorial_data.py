@@ -16,8 +16,6 @@ def gen_combinatorial_parameters(Ng, C_rank, Np_dim, shape):
     @input: shape <string>: "Parallelepiped", "Cylinder" o "Ellipsoid" según el caso
     @output: datos <pd.DataFrame>: salida de los datos combinatoriales. 
     """
-    #N_dir = {"Parallelepiped": 2, "Cylinder": 2, "Ellipsoid": 2}
-    #keys_dims = {"Parallelepiped": ["gamma", "beta"], "Cylinder": ["gamma", "beta"], "Ellipsoid": ["gamma", "beta"]}
     max_eta = {"Parallelepiped": 0.5*np.pi, "Cylinder": np.pi, "Ellipsoid": 0.5*np.pi}
     max_beta = {"Parallelepiped": np.pi, "Cylinder": np.pi, "Ellipsoid": np.pi}
     geometry_options = {"Parallelepiped": {"theta": True, "phi": True}, 
@@ -64,4 +62,4 @@ if __name__ == "__main__":
     """
     """
     ruta_archivo = "input_data/" + "combi_" + str(os.getpid()) + ".csv"
-    generate_combinatorial_data_isotropic(ruta_archivo, 6, 20, 5, "Parallelepiped")  
+    generate_combinatorial_data_isotropic(ruta_archivo, 6, 10, 4, "Parallelepiped")  
