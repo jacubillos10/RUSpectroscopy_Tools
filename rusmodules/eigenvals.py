@@ -83,13 +83,14 @@ def get_eigenvalues_from_crystal_structure(Ng, const_relations, eta, beta, shape
     const_relations -- <dict> A dictionary containing the values of the 
              independent contants according to a crystal structure. All keys
              MUST start with "x_". For example, in a isotropic material a 
-             dictionary like this must be the argument: {"x_K": 3, "x_mu": 4}
+             dictionary like this must be the argument: {"x_K": 3/5, "x_mu": 4/5}
     eta -- <float> First relation in the dimensions of the sample:
              cos(2*eta) = lz/(lx^2 + ly^2 + lz^2).
     beta -- <float> Second relation in the dimensions of the sample:
             cos(4*beta) = lx/(lx^2 + ly^2).
     shape -- <string> Shape of the sample. Currently only supports one of these
              values: "Parallelepiped", "Cylinder", and "Ellipsoid".
+    mutl -- <float> Multiplier of the elastic constants 
     
     Returns:
     A dictionary containing the following:
